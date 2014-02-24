@@ -1,0 +1,24 @@
+
+/* Main Div */
+#wrapper {
+
+}
+
+/* Canvas with the game */
+#board {
+	border: 1px solid black;
+	border-radius: 3px;
+
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+
+    display: block;
+
+    width: 800px;
+    height: 600px;
+
+    border
+
+}
