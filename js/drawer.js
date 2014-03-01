@@ -18,13 +18,11 @@
       return context.restore();
     };
 
-    Drawer.prototype.img = function(context, image, angle, center, width, height) {
-      width = width || image.width;
-      height = height || image.height;
+    Drawer.prototype.image = function(context, img, angle, center, width, height) {
       context.save();
       context.translate(center.x, center.y);
       context.rotate(angle * Math.PI / 180);
-      context.drawImage(image, -width / 2, -height / 2, width, height);
+      context.drawImage(img, -width / 2, -height / 2, width, height);
       return context.restore();
     };
 
