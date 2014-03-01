@@ -42,25 +42,16 @@
 
     Mirror.prototype.img = null;
 
-    function Mirror(image, x, y, angle) {
+    function Mirror(x, y, angle) {
       this.x = x != null ? x : 0;
       this.y = y != null ? y : 0;
       this.angle = angle != null ? angle : 0;
-      this.img = new Image;
-      this.img.src = image;
     }
-
-    Mirror.prototype.draw = function(context) {
-      return drawer.image(context, this.img, this.angle, {
-        x: this.x,
-        y: this.y
-      });
-    };
 
     return Mirror;
 
   })(Object);
 
-  window.Object = Object;
+  window.Mirror = Mirror;
 
 }).call(this);

@@ -18,11 +18,11 @@ class Object
 class Mirror extends Object
 	img: null
 
-	constructor: (image, @x=0, @y=0, @angle=0) ->
-		@img = new Image
-		@img.src = image
+	constructor: (@x=0, @y=0, @angle=0) ->
+		#@img = new Image
+		#@img.src = image
 
-	draw: (context) ->
-		drawer.image context, @img, @angle, {x: @x, y: @y }
+	#draw: (context) ->
+		#drawer.image context, @img, @angle, {x: @x, y: @y }
 
-window.Object = Object
+window.Mirror = Mirror

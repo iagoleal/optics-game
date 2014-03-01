@@ -1,20 +1,41 @@
-class
+class Board
+	canvas: null
+	context: null
 
-canvas = null
-context = null
-window.ang = null
+	mirrors: null
+
+	constructor: (cv) ->
+		@canvas = document.getElementById(cv)
+		@context = @canvas.getContext "2d"
+
+		@mirrors = []
+
+	addMirror: (x, y, angle=0) ->
+		@mirrors.push new Mirror x, y, angle
+
+	draw: () ->
+		@canvas.width = @canvas.width
+		for m in @mirrors
+			m.draw @context
+
+	animate: () ->
+		for m in @mirrors
+			m.turn 1
+		setTimeout => 
+			@animate()
+		, 1000/1000
+
 window.onload = () ->
-	canvas = document.getElementById "board"
-	context = canvas.getContext "2d"
-	window.ang = new Object(400, 300, 30)
+	window.board = new Board "board"
+	window.board.addMirror(100, 100, 20)
+	window.board.animate()
 	requestAnimationFrame(mainLoop)
 
 mainLoop = () ->
 	#context.clearRect 0, 0, canvas.width, canvas.height
 	#console.log canvas.width, canvas.height
-	canvas.width = canvas.width
-	ang.draw(context)
-	ang.turn(1)
+
+	board.draw()
 	requestAnimationFrame(mainLoop)	
 
 window.requestAnimationFrame = do ->
