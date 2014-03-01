@@ -59,6 +59,14 @@
   };
 
   mainLoop = function() {
+    var fps;
+    if (typeof mainLoop.lastTime === 'undefined') {
+      mainLoop.lastTime = new Date().getTime();
+    } else {
+      fps = 1000 / (new Date().getTime() - mainLoop.lastTime);
+      document.getElementById("fps").innerHTML = fps.toFixed(2) + ' fps';
+      mainLoop.lastTime = new Date().getTime();
+    }
     board.draw();
     return requestAnimationFrame(mainLoop);
   };

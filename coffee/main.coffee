@@ -32,8 +32,12 @@ window.onload = () ->
 	requestAnimationFrame(mainLoop)
 
 mainLoop = () ->
-	#context.clearRect 0, 0, canvas.width, canvas.height
-	#console.log canvas.width, canvas.height
+	if typeof mainLoop.lastTime is 'undefined'
+		mainLoop.lastTime = new Date().getTime()
+	else
+		fps = 1000/(new Date().getTime() - mainLoop.lastTime)
+		document.getElementById("fps").innerHTML = fps.toFixed(2) + ' fps'
+		mainLoop.lastTime = new Date().getTime()
 
 	board.draw()
 	requestAnimationFrame(mainLoop)	
