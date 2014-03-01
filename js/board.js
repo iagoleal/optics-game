@@ -5,15 +5,12 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Object = (function() {
-    Object.prototype.x = 0;
-
-    Object.prototype.y = 0;
+    Object.prototype.position = null;
 
     Object.prototype.angle = 0;
 
-    function Object(x, y, angle) {
-      this.x = x != null ? x : 0;
-      this.y = y != null ? y : 0;
+    function Object(position, angle) {
+      this.position = position != null ? position : null;
       this.angle = angle != null ? angle : 0;
     }
 
@@ -28,8 +25,8 @@
 
     Object.prototype.draw = function(context) {
       return drawer.rectangle(context, "fill", this.angle, {
-        x: this.x,
-        y: this.y
+        x: this.position.x,
+        y: this.position.y
       }, 100, 100);
     };
 

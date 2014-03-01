@@ -25,11 +25,11 @@ class Board
 			@animate()
 		, 1000/1000
 
+
 window.onload = () ->
 	window.board = new Board "board"
 	window.board.addMirror(100, 100, 20)
 	window.board.animate()
-	requestAnimationFrame(mainLoop)
 
 mainLoop = () ->
 	if typeof mainLoop.lastTime is 'undefined'

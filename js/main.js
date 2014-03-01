@@ -54,8 +54,7 @@
   window.onload = function() {
     window.board = new Board("board");
     window.board.addMirror(100, 100, 20);
-    window.board.animate();
-    return requestAnimationFrame(mainLoop);
+    return window.board.animate();
   };
 
   mainLoop = function() {
