@@ -10,8 +10,8 @@ class Board
 
 		@mirrors = []
 
-	addMirror: (x, y, angle=0) ->
-		@mirrors.push new Mirror x, y, angle
+	addMirror: (pos, angle=0) ->
+		@mirrors.push new Mirror pos, angle
 
 	draw: () ->
 		@canvas.width = @canvas.width
@@ -28,8 +28,10 @@ class Board
 
 window.onload = () ->
 	window.board = new Board "board"
-	window.board.addMirror(100, 100, 20)
+	window.board.addMirror {x: 100, y: 100}, 0
 	window.board.animate()
+
+	requestAnimationFrame(mainLoop)	
 
 mainLoop = () ->
 	if typeof mainLoop.lastTime is 'undefined'
@@ -39,7 +41,7 @@ mainLoop = () ->
 		document.getElementById("fps").innerHTML = fps.toFixed(2) + ' fps'
 		mainLoop.lastTime = new Date().getTime()
 
-	board.draw()
+	window.board.draw()
 	requestAnimationFrame(mainLoop)	
 
 window.requestAnimationFrame = do ->

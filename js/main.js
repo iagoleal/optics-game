@@ -15,11 +15,11 @@
       this.mirrors = [];
     }
 
-    Board.prototype.addMirror = function(x, y, angle) {
+    Board.prototype.addMirror = function(pos, angle) {
       if (angle == null) {
         angle = 0;
       }
-      return this.mirrors.push(new Mirror(x, y, angle));
+      return this.mirrors.push(new Mirror(pos, angle));
     };
 
     Board.prototype.draw = function() {
@@ -53,8 +53,12 @@
 
   window.onload = function() {
     window.board = new Board("board");
-    window.board.addMirror(100, 100, 20);
-    return window.board.animate();
+    window.board.addMirror({
+      x: 100,
+      y: 100
+    }, 0);
+    window.board.animate();
+    return requestAnimationFrame(mainLoop);
   };
 
   mainLoop = function() {
@@ -66,7 +70,7 @@
       document.getElementById("fps").innerHTML = fps.toFixed(2) + ' fps';
       mainLoop.lastTime = new Date().getTime();
     }
-    board.draw();
+    window.board.draw();
     return requestAnimationFrame(mainLoop);
   };
 
