@@ -1,18 +1,20 @@
+class
+
 canvas = null
 context = null
-ang = 0
-
+window.ang = null
 window.onload = () ->
 	canvas = document.getElementById "board"
 	context = canvas.getContext "2d"
+	window.ang = new Object(400, 300, 30)
 	requestAnimationFrame(mainLoop)
 
 mainLoop = () ->
 	#context.clearRect 0, 0, canvas.width, canvas.height
 	#console.log canvas.width, canvas.height
 	canvas.width = canvas.width
-	drawer.rect context, "fill", ang, {x: 400, y: 300 }, 100, 100
-	ang++
+	ang.draw(context)
+	ang.turn(1)
 	requestAnimationFrame(mainLoop)	
 
 window.requestAnimationFrame = do ->
