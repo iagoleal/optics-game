@@ -1,4 +1,4 @@
-class Object
+class Turnable
 	position: null
 	angle: 0
 
@@ -14,8 +14,19 @@ class Object
 	draw: (context) ->
 		drawer.rectangle context, "fill", @angle, @position, 100, 100
 
-class Mirror extends Object
+class Mirror extends Turnable
 	img: null
+
+	draw: (context) ->
+		drawer.rectangle context, "fill", @angle, @position, 100, 100
+
+class LaserGun extends Turnable
+	img: null
+
+	draw: (context) ->
+
+		drawer.polygon context, "fill", @angle, @position, 3, 30
 
 
 window.Mirror = Mirror
+window.LaserGun = LaserGun

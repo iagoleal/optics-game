@@ -2,12 +2,14 @@ class Board
 	canvas: null
 	context: null
 
+	gun: null
 	mirrors: null
 
 	constructor: (cv) ->
 		@canvas = document.getElementById(cv)
 		@context = @canvas.getContext "2d"
 
+		@gun = new LaserGun {x: 100, y: 400}, 0
 		@mirrors = []
 
 	addMirror: (pos, angle=0) ->
@@ -17,6 +19,7 @@ class Board
 		@canvas.width = @canvas.width
 		for m in @mirrors
 			m.draw @context
+		@gun.draw @context
 
 	animate: () ->
 		for m in @mirrors

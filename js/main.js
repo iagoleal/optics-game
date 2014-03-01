@@ -7,11 +7,17 @@
 
     Board.prototype.context = null;
 
+    Board.prototype.gun = null;
+
     Board.prototype.mirrors = null;
 
     function Board(cv) {
       this.canvas = document.getElementById(cv);
       this.context = this.canvas.getContext("2d");
+      this.gun = new LaserGun({
+        x: 100,
+        y: 400
+      }, 0);
       this.mirrors = [];
     }
 
@@ -23,15 +29,14 @@
     };
 
     Board.prototype.draw = function() {
-      var m, _i, _len, _ref, _results;
+      var m, _i, _len, _ref;
       this.canvas.width = this.canvas.width;
       _ref = this.mirrors;
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         m = _ref[_i];
-        _results.push(m.draw(this.context));
+        m.draw(this.context);
       }
-      return _results;
+      return this.gun.draw(this.context);
     };
 
     Board.prototype.animate = function() {
