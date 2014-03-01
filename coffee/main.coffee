@@ -3,10 +3,11 @@ class
 canvas = null
 context = null
 window.ang = null
+
 window.onload = () ->
 	canvas = document.getElementById "board"
 	context = canvas.getContext "2d"
-	window.ang = new Object(400, 300, 30)
+	window.ang = new Object({x: 400, y:300}, 30)
 	requestAnimationFrame(mainLoop)
 
 mainLoop = () ->
