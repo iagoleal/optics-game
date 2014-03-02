@@ -1,15 +1,15 @@
 class Drawer
 	angleMod: Math.PI/180
 
-	line: (context, start, end, options={}) ->
-		for option, i in options
-			switch i
+	setOptions: (context, options) ->
+		for index, option of options
+			switch index
 				when "color" 
 					context.strokeStyle = option
 				when "width"
 					context.lineWidth = option
 				when "shadow"
-					for shadowOption, j in option
+					for j, shadowOption of option
 						switch j
 							when "blur"
 								context.shadowBlur = shadowOption
@@ -20,14 +20,17 @@ class Drawer
 							when "offsetY"
 								context.shadowOffsetY = shadowOption
 
+
+	line: (context, start, end, options={}) ->
+
+		@setOptions(context, options)
+
 		context.beginPath()
 		context.moveTo start.x, start.y
 		context.lineTo end.x, end.y
 		context.closePath()
 
 		context.stroke()
-
-
 
 	rectangle: (context, type, angle, center, width, height) ->
 		context.save()

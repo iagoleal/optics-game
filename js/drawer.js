@@ -7,39 +7,56 @@
 
     Drawer.prototype.angleMod = Math.PI / 180;
 
+    Drawer.prototype.setOptions = function(context, options) {
+      var index, j, option, shadowOption, _results;
+      _results = [];
+      for (index in options) {
+        option = options[index];
+        switch (index) {
+          case "color":
+            _results.push(context.strokeStyle = option);
+            break;
+          case "width":
+            _results.push(context.lineWidth = option);
+            break;
+          case "shadow":
+            _results.push((function() {
+              var _results1;
+              _results1 = [];
+              for (j in option) {
+                shadowOption = option[j];
+                switch (j) {
+                  case "blur":
+                    _results1.push(context.shadowBlur = shadowOption);
+                    break;
+                  case "color":
+                    _results1.push(context.shadowColor = shadowOption);
+                    break;
+                  case "offsetX":
+                    _results1.push(context.shadowOffsetX = shadowOption);
+                    break;
+                  case "offsetY":
+                    _results1.push(context.shadowOffsetY = shadowOption);
+                    break;
+                  default:
+                    _results1.push(void 0);
+                }
+              }
+              return _results1;
+            })());
+            break;
+          default:
+            _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
     Drawer.prototype.line = function(context, start, end, options) {
-      var i, j, option, shadowOption, _i, _j, _len, _len1;
       if (options == null) {
         options = {};
       }
-      for (i = _i = 0, _len = options.length; _i < _len; i = ++_i) {
-        option = options[i];
-        switch (i) {
-          case "color":
-            context.strokeStyle = option;
-            break;
-          case "width":
-            context.lineWidth = option;
-            break;
-          case "shadow":
-            for (j = _j = 0, _len1 = option.length; _j < _len1; j = ++_j) {
-              shadowOption = option[j];
-              switch (j) {
-                case "blur":
-                  context.shadowBlur = shadowOption;
-                  break;
-                case "color":
-                  context.shadowColor = shadowOption;
-                  break;
-                case "offsetX":
-                  context.shadowOffsetX = shadowOption;
-                  break;
-                case "offsetY":
-                  context.shadowOffsetY = shadowOption;
-              }
-            }
-        }
-      }
+      this.setOptions(context, options);
       context.beginPath();
       context.moveTo(start.x, start.y);
       context.lineTo(end.x, end.y);

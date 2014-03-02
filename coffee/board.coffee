@@ -52,8 +52,9 @@ class Laser
 		if @path.length > 0
 			p1 = @origin
 			for p2 in @path
-				drawer.line(context, p1, p2)
+				drawer.line context, p1, p2, {color: 'red', width: 5, shadow: {color: '#a00', offsetX: 0, offsetY: 0, blur: 25}}
 				p1 = p2
+		drawer.setOptions context, {shadow: {blur: 0}}
 
 
 window.PlaneMirror = PlaneMirror

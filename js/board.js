@@ -132,18 +132,30 @@
     };
 
     Laser.prototype.draw = function(context) {
-      var p1, p2, _i, _len, _ref5, _results;
+      var p1, p2, _i, _len, _ref5;
       if (this.path.length > 0) {
         p1 = this.origin;
         _ref5 = this.path;
-        _results = [];
         for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
           p2 = _ref5[_i];
-          drawer.line(context, p1, p2);
-          _results.push(p1 = p2);
+          drawer.line(context, p1, p2, {
+            color: 'red',
+            width: 5,
+            shadow: {
+              color: '#a00',
+              offsetX: 0,
+              offsetY: 0,
+              blur: 25
+            }
+          });
+          p1 = p2;
         }
-        return _results;
       }
+      return drawer.setOptions(context, {
+        shadow: {
+          blur: 0
+        }
+      });
     };
 
     return Laser;
