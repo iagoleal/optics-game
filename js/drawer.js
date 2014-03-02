@@ -7,6 +7,46 @@
 
     Drawer.prototype.angleMod = Math.PI / 180;
 
+    Drawer.prototype.line = function(context, start, end, options) {
+      var i, j, option, shadowOption, _i, _j, _len, _len1;
+      if (options == null) {
+        options = {};
+      }
+      for (i = _i = 0, _len = options.length; _i < _len; i = ++_i) {
+        option = options[i];
+        switch (i) {
+          case "color":
+            context.strokeStyle = option;
+            break;
+          case "width":
+            context.lineWidth = option;
+            break;
+          case "shadow":
+            for (j = _j = 0, _len1 = option.length; _j < _len1; j = ++_j) {
+              shadowOption = option[j];
+              switch (j) {
+                case "blur":
+                  context.shadowBlur = shadowOption;
+                  break;
+                case "color":
+                  context.shadowColor = shadowOption;
+                  break;
+                case "offsetX":
+                  context.shadowOffsetX = shadowOption;
+                  break;
+                case "offsetY":
+                  context.shadowOffsetY = shadowOption;
+              }
+            }
+        }
+      }
+      context.beginPath();
+      context.moveTo(start.x, start.y);
+      context.lineTo(end.x, end.y);
+      context.closePath();
+      return context.stroke();
+    };
+
     Drawer.prototype.rectangle = function(context, type, angle, center, width, height) {
       context.save();
       context.translate(center.x, center.y);
@@ -24,7 +64,7 @@
       var a, i, _i;
       context.save();
       context.translate(center.x, center.y);
-      context.rotate((angle - 90) * this.angleMod);
+      context.rotate(angle * this.angleMod);
       a = (Math.PI * 2) / sides;
       context.beginPath();
       context.moveTo(radius, 0);

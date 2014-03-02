@@ -19,6 +19,22 @@
     width: 800px;
     height: 600px;
 
-    border
+}
 
+.control {
+    padding: 10px 10px;
+    color: #ffffff;
+
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.6);
+    box-sizing: border-box;
+    box-shadow:5px 5px 5px rgba(0, 0, 0, 0.4);
+}
+
+#commands {
+    position: fixed;
+    z-index: 1;
+    left: 1%;
+    top: 1%;
+    text-align: center;
 }

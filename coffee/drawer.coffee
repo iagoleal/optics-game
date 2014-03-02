@@ -1,6 +1,34 @@
 class Drawer
 	angleMod: Math.PI/180
 
+	line: (context, start, end, options={}) ->
+		for option, i in options
+			switch i
+				when "color" 
+					context.strokeStyle = option
+				when "width"
+					context.lineWidth = option
+				when "shadow"
+					for shadowOption, j in option
+						switch j
+							when "blur"
+								context.shadowBlur = shadowOption
+							when "color"
+								context.shadowColor = shadowOption
+							when "offsetX"
+								context.shadowOffsetX = shadowOption
+							when "offsetY"
+								context.shadowOffsetY = shadowOption
+
+		context.beginPath()
+		context.moveTo start.x, start.y
+		context.lineTo end.x, end.y
+		context.closePath()
+
+		context.stroke()
+
+
+
 	rectangle: (context, type, angle, center, width, height) ->
 		context.save()
 
@@ -16,7 +44,7 @@ class Drawer
 		context.save()
 		
 		context.translate(center.x, center.y)
-		context.rotate (angle - 90)*@angleMod
+		context.rotate (angle)*@angleMod
 		
 		a = (Math.PI*2)/sides
 
@@ -39,5 +67,6 @@ class Drawer
 		context.drawImage(img, -width/2, -height/2, width, height)
 
 		context.restore()
+
 
 window.drawer = new Drawer

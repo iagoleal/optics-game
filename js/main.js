@@ -7,36 +7,87 @@
 
     Board.prototype.context = null;
 
+    Board.prototype.width = 0;
+
+    Board.prototype.height = 0;
+
     Board.prototype.gun = null;
 
     Board.prototype.mirrors = null;
 
+    Board.prototype.laser = null;
+
     function Board(cv) {
       this.canvas = document.getElementById(cv);
       this.context = this.canvas.getContext("2d");
+      this.width = this.canvas.width;
+      this.height = this.canvas.height;
       this.gun = new LaserGun({
-        x: 100,
-        y: 400
+        x: this.width / 2,
+        y: this.height / 2
       }, 0);
+      this.laser = new Laser(this.gun.pos);
       this.mirrors = [];
     }
+
+    Board.prototype.shot = function(pos) {
+      var dx, dy;
+      dx = pos.x - this.gun.pos.x;
+      dy = pos.y - this.gun.pos.y;
+      this.gun.angle = Math.atan2(dy, dx) * 180 / Math.PI;
+      console.log(this.gun.angle, dy / dx);
+      this.laser.clear();
+      while (!this.collision(pos)) {
+        switch (false) {
+          case dx !== 0:
+            pos.x = this.gun.pos.x;
+            pos.y = dy > 0 ? this.height : 0;
+            break;
+          case !(dx > 0 && dy >= 0):
+            pos.x += 1;
+            pos.y += dy / dx;
+            break;
+          case !(dx > 0 && dy < 0):
+            pos.x += 1;
+            pos.y += dy / dx;
+            break;
+          case !(dx < 0 && dy <= 0):
+            pos.x -= 1;
+            pos.y -= dy / dx;
+            break;
+          case !(dx < 0 && dy > 0):
+            pos.x -= 1;
+            pos.y -= dy / dx;
+            break;
+        }
+      }
+      return this.laser.addPoint(pos);
+    };
+
+    Board.prototype.collision = function(pos) {
+      if (pos.x <= 0 || pos.x >= this.width || pos.y <= 0 || pos.y >= this.height) {
+        return true;
+      }
+      return false;
+    };
 
     Board.prototype.addMirror = function(pos, angle) {
       if (angle == null) {
         angle = 0;
       }
-      return this.mirrors.push(new Mirror(pos, angle));
+      return this.mirrors.push(new PlaneMirror(pos, angle));
     };
 
     Board.prototype.draw = function() {
       var m, _i, _len, _ref;
-      this.canvas.width = this.canvas.width;
+      this.context.clearRect(0, 0, this.width, this.height);
       _ref = this.mirrors;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         m = _ref[_i];
         m.draw(this.context);
       }
-      return this.gun.draw(this.context);
+      this.gun.draw(this.context);
+      return this.laser.draw(this.context);
     };
 
     Board.prototype.animate = function() {
@@ -49,7 +100,7 @@
       }
       return setTimeout(function() {
         return _this.animate();
-      }, 1000 / 1000);
+      }, 1000 / 100);
     };
 
     return Board;
@@ -57,12 +108,21 @@
   })();
 
   window.onload = function() {
+    var _this = this;
     window.board = new Board("board");
     window.board.addMirror({
       x: 100,
       y: 100
     }, 0);
     window.board.animate();
+    document.getElementById('board').addEventListener('click', function(e) {
+      var pos;
+      pos = {
+        x: e.pageX - board.canvas.offsetLeft,
+        y: e.pageY - board.canvas.offsetTop
+      };
+      return board.shot(pos);
+    });
     return requestAnimationFrame(mainLoop);
   };
 
