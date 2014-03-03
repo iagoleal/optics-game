@@ -45,6 +45,12 @@
 
     Mirror.prototype.img = null;
 
+    Mirror.prototype.width = 100;
+
+    Mirror.prototype.draw = function(context) {
+      return drawer.rectangle(context, "fill", this.angle, this.pos, this.width, 10);
+    };
+
     return Mirror;
 
   })(Turnable);
@@ -93,10 +99,19 @@
       return _ref4;
     }
 
+    LaserGun.prototype.radius = 30;
+
     LaserGun.prototype.img = null;
 
+    LaserGun.prototype.front = function() {
+      return {
+        x: this.pos.x + this.radius * Math.cos(this.angle * Math.PI / 180),
+        y: this.pos.y + this.radius * Math.sin(this.angle * Math.PI / 180)
+      };
+    };
+
     LaserGun.prototype.draw = function(context) {
-      return drawer.polygon(context, "fill", this.angle, this.pos, 3, 30);
+      return drawer.polygon(context, "fill", this.angle, this.pos, 3, this.radius);
     };
 
     return LaserGun;
@@ -120,8 +135,8 @@
       return this.path.push(p);
     };
 
-    Laser.prototype.removePoint = function(p) {
-      return this.path.pop;
+    Laser.prototype.end = function(p) {
+      return this.path[this.path.length];
     };
 
     Laser.prototype.clear = function(start) {

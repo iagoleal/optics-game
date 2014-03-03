@@ -26,13 +26,17 @@ class Board
 		dy = pos.y - @gun.pos.y
 
 		@gun.angle = Math.atan2(dy, dx) * 180 / Math.PI
+		#console.log @gun.angle, dy/dx
+		
+		@laser.clear(@gun.front())
 
-		console.log @gun.angle, dy/dx
-		@laser.clear()
+		###
+		  4 |  1
+ 		---------
+ 		  3 |  2
+		###
 
 		while ! @collision(pos)
-			#pos.x += if dx > 0 and dy < 0 then 1 else -1
-			#pos.y += if dx > 0 then dy/dx else -(dy/dx)
 			switch
 				#Slope is Infinity
 				when dx is 0
@@ -61,7 +65,7 @@ class Board
 	collision: (pos) ->
 		if pos.x <= 0 or pos.x >= @width or pos.y <= 0 or pos.y >= @height
 			return true
-		return false
+		return null
 
 
 	addMirror: (pos, angle=0) ->
@@ -87,6 +91,7 @@ window.onload = () ->
 	window.board.addMirror {x: 100, y: 100}, 0
 	window.board.animate()
 
+	#Click Event
 	document.getElementById('board').addEventListener 'click', (e) =>
 		pos = 
 			x: e.pageX - board.canvas.offsetLeft

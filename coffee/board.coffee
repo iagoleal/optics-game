@@ -18,7 +18,10 @@ class Turnable
 
 class Mirror extends Turnable
 	img: null
+	width: 100
 
+	draw: (context) ->
+		drawer.rectangle context, "fill", @angle, @pos, @width, 10
 
 class PlaneMirror extends Mirror
 
@@ -27,10 +30,17 @@ class ConvexMirror extends Mirror
 class ConcaveMirror extends Mirror
 
 class LaserGun extends Turnable
+	radius: 30
 	img: null
 
+	front: () ->
+		x: @pos.x + @radius*Math.cos(@angle*Math.PI/180)
+		y: @pos.y + @radius*Math.sin(@angle*Math.PI/180)
+
+
+
 	draw: (context) ->
-		drawer.polygon context, "fill", @angle, @pos, 3, 30
+		drawer.polygon context, "fill", @angle, @pos, 3, @radius
 
 class Laser
 	origin: null
@@ -42,7 +52,7 @@ class Laser
 	addPoint: (p) ->
 		@path.push p
 
-	removePoint: (p) -> @path.pop
+	end: (p) -> @path[@path.length]
 
 	clear: (start) ->
 		@path = []

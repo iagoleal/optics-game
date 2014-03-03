@@ -35,8 +35,13 @@
       dx = pos.x - this.gun.pos.x;
       dy = pos.y - this.gun.pos.y;
       this.gun.angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      console.log(this.gun.angle, dy / dx);
-      this.laser.clear();
+      this.laser.clear(this.gun.front());
+      /*
+      		  4 |  1
+       		---------
+       		  3 |  2
+      */
+
       while (!this.collision(pos)) {
         switch (false) {
           case dx !== 0:
@@ -68,7 +73,7 @@
       if (pos.x <= 0 || pos.x >= this.width || pos.y <= 0 || pos.y >= this.height) {
         return true;
       }
-      return false;
+      return null;
     };
 
     Board.prototype.addMirror = function(pos, angle) {
