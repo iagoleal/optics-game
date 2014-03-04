@@ -1,11 +1,12 @@
 class Drawer
 	angleMod: Math.PI/180
 
-	setOptions: (context, options) ->
+	setOptions: (context, type, options) ->
 		for index, option of options
 			switch index
 				when "color" 
 					context.strokeStyle = option
+					context.fillStyle = option
 				when "width"
 					context.lineWidth = option
 				when "shadow"
@@ -22,8 +23,9 @@ class Drawer
 
 
 	line: (context, start, end, options={}) ->
-
-		@setOptions(context, options)
+		context.save()
+		
+		@setOptions(context, 'stroke', options)
 
 		context.beginPath()
 		context.moveTo start.x, start.y
@@ -32,8 +34,44 @@ class Drawer
 
 		context.stroke()
 
-	rectangle: (context, type, angle, center, width, height) ->
+		context.restore()
+
+	distance: (context, angle, start, distance, options={}) ->
 		context.save()
+
+		@setOptions(context, 'stroke', options)
+
+		context.translate(start.x, start.y)
+		context.rotate angle*@angleMod
+
+		context.beginPath()
+		context.moveTo 0, 0
+		context.lineTo distance, distance
+		context.closePath()
+		
+		context.stroke()
+
+		context.restore()
+
+	path: (context, points, options={}) ->
+		context.save()
+		
+		@setOptions(context, 'stroke', options)
+
+		context.beginPath()
+		context.moveTo points[0].x, points[0].y
+		for p in points[1..]
+			context.lineTo p.x, p.y
+		context.closePath()
+
+		context.stroke()
+
+		context.restore()
+
+	rectangle: (context, type, angle, center, width, height, options={}) ->
+		context.save()
+
+		@setOptions(context, type, options)
 
 		context.translate(center.x, center.y)
 		context.rotate angle*@angleMod
@@ -43,8 +81,10 @@ class Drawer
 
 		context.restore()
 
-	polygon: (context, type, angle, center, sides, radius) ->
+	polygon: (context, type, angle, center, sides, radius, options={}) ->
 		context.save()
+
+		@setOptions(context, type, options)
 		
 		context.translate(center.x, center.y)
 		context.rotate (angle)*@angleMod
@@ -58,16 +98,6 @@ class Drawer
 		context.closePath()
 
 		if type is "stroke" then context.stroke() else context.fill()
-
-		context.restore()
-
-	image: (context, img, angle, center, width, height) ->
-		context.save()
-
-		context.translate(center.x, center.y)
-		context.rotate angle*@angleMod
-
-		context.drawImage(img, -width/2, -height/2, width, height)
 
 		context.restore()
 

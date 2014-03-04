@@ -1,13 +1,12 @@
 
 /* Main Div */
 #wrapper {
-
+    position: relative;
 }
 
 /* Canvas with the game */
-#board {
-	border: 1px solid black;
-	border-radius: 3px;
+.cv {
+    position: absolute;
 
     padding-left: 0;
     padding-right: 0;
@@ -16,9 +15,18 @@
 
     display: block;
 
+    left: 50%;
+    margin-left: -400px;
+
     width: 800px;
     height: 600px;
 
+
+}
+
+#board {
+    border: 1px solid black;
+    border-radius: 3px;
 }
 
 .control {

@@ -5,12 +5,12 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   Turnable = (function() {
-    Turnable.prototype.pos = null;
+    Turnable.prototype.position = null;
 
     Turnable.prototype.angle = 0;
 
-    function Turnable(pos, angle) {
-      this.pos = pos != null ? pos : {
+    function Turnable(position, angle) {
+      this.position = position != null ? position : {
         x: 0,
         y: 0
       };
@@ -25,10 +25,6 @@
         this.angle += 360;
       }
       return this;
-    };
-
-    Turnable.prototype.draw = function(context) {
-      return drawer.rectangle(context, "fill", this.angle, this.pos, 100, 10);
     };
 
     return Turnable;
@@ -47,9 +43,9 @@
 
     Mirror.prototype.width = 100;
 
-    Mirror.prototype.draw = function(context) {
-      return drawer.rectangle(context, "fill", this.angle, this.pos, this.width, 10);
-    };
+    Mirror.prototype.height = 10;
+
+    Mirror.prototype.type = "Mirror";
 
     return Mirror;
 
@@ -62,6 +58,37 @@
       _ref1 = PlaneMirror.__super__.constructor.apply(this, arguments);
       return _ref1;
     }
+
+    PlaneMirror.prototype.collided = function(point) {
+      var c, rx, ry, s;
+      c = Math.cos(-this.angle * Math.PI / 180);
+      s = Math.sin(-this.angle * Math.PI / 180);
+      rx = this.position.x + c * (point.x - this.position.x) - s * (point.y - this.position.y);
+      ry = this.position.y + s * (point.x - this.position.x) + c * (point.y - this.position.y);
+      return this.position.x - this.width / 2 <= rx && this.position.x + this.width / 2 >= rx && this.position.y - this.height / 2 <= ry && this.position.y + this.height / 2 >= ry;
+    };
+
+    PlaneMirror.prototype.reflect = function(point, ang) {
+      if (this.collided(point)) {
+        return 360 - ang - 2 * this.angle;
+      }
+      return null;
+    };
+
+    PlaneMirror.prototype.draw = function(context) {
+      drawer.rectangle(context, "fill", this.angle, this.position, this.width, this.height, {
+        color: 'black',
+        shadow: {
+          color: '#fff',
+          offsetX: 0,
+          offsetY: 0,
+          blur: 10
+        }
+      });
+      return drawer.distance(context, 45 + this.angle, this.position, 100, {
+        color: 'white'
+      });
+    };
 
     return PlaneMirror;
 
@@ -105,13 +132,16 @@
 
     LaserGun.prototype.front = function() {
       return {
-        x: this.pos.x + this.radius * Math.cos(this.angle * Math.PI / 180),
-        y: this.pos.y + this.radius * Math.sin(this.angle * Math.PI / 180)
+        x: this.position.x + this.radius * Math.cos(this.angle * Math.PI / 180),
+        y: this.position.y + this.radius * Math.sin(this.angle * Math.PI / 180)
       };
     };
 
     LaserGun.prototype.draw = function(context) {
-      return drawer.polygon(context, "fill", this.angle, this.pos, 3, this.radius);
+      return drawer.polygon(context, "stroke", this.angle, this.position, 3, this.radius, {
+        width: 1,
+        color: 'white'
+      });
     };
 
     return LaserGun;
@@ -119,16 +149,13 @@
   })(Turnable);
 
   Laser = (function() {
-    Laser.prototype.origin = null;
-
     Laser.prototype.path = null;
 
     function Laser(origin) {
-      this.origin = origin != null ? origin : {
-        x: 0,
-        y: 0
-      };
       this.path = [];
+      if (origin) {
+        this.path.push(origin);
+      }
     }
 
     Laser.prototype.addPoint = function(p) {
@@ -136,41 +163,34 @@
     };
 
     Laser.prototype.end = function(p) {
-      return this.path[this.path.length];
+      var a;
+      a = this.path[this.path.length - 1];
+      if (p != null) {
+        this.path[this.path.length] = p;
+      }
+      return a;
     };
 
-    Laser.prototype.clear = function(start) {
+    Laser.prototype.clear = function(origin) {
       this.path = [];
-      if (start) {
-        return this.origin = start;
+      if (origin) {
+        return this.path.push(origin);
       }
     };
 
     Laser.prototype.draw = function(context) {
-      var p1, p2, _i, _len, _ref5;
-      if (this.path.length > 0) {
-        p1 = this.origin;
-        _ref5 = this.path;
-        for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
-          p2 = _ref5[_i];
-          drawer.line(context, p1, p2, {
-            color: 'red',
-            width: 5,
-            shadow: {
-              color: '#a00',
-              offsetX: 0,
-              offsetY: 0,
-              blur: 25
-            }
-          });
-          p1 = p2;
-        }
+      if (this.path.length > 1) {
+        return drawer.path(context, this.path, {
+          color: '#ddeeff',
+          width: 5,
+          shadow: {
+            color: '#a00',
+            offsetX: 0,
+            offsetY: 0,
+            blur: 25
+          }
+        });
       }
-      return drawer.setOptions(context, {
-        shadow: {
-          blur: 0
-        }
-      });
     };
 
     return Laser;

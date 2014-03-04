@@ -7,6 +7,8 @@
 
     Board.prototype.context = null;
 
+    Board.prototype.bgContext = null;
+
     Board.prototype.width = 0;
 
     Board.prototype.height = 0;
@@ -18,23 +20,32 @@
     Board.prototype.laser = null;
 
     function Board(cv) {
+      var bcanvas;
       this.canvas = document.getElementById(cv);
       this.context = this.canvas.getContext("2d");
+      bcanvas = document.getElementById('bground');
+      this.bgContext = bcanvas.getContext("2d");
       this.width = this.canvas.width;
       this.height = this.canvas.height;
+      this.context.fillStyle = 'white';
+      this.context.strokeStyle = 'white';
+      this.bgContext.fillStyle = 'black';
+      this.bgContext.fillRect(0, 0, this.width, this.height);
       this.gun = new LaserGun({
         x: this.width / 2,
         y: this.height / 2
       }, 0);
-      this.laser = new Laser(this.gun.pos);
+      this.laser = new Laser(this.gun.position);
       this.mirrors = [];
     }
 
     Board.prototype.shot = function(pos) {
-      var dx, dy;
-      dx = pos.x - this.gun.pos.x;
-      dy = pos.y - this.gun.pos.y;
+      var ang, dx, dy, m, slope;
+      dx = pos.x - this.gun.position.x;
+      dy = pos.y - this.gun.position.y;
+      slope = dy / dx;
       this.gun.angle = Math.atan2(dy, dx) * 180 / Math.PI;
+      console.log(this.gun.angle, slope);
       this.laser.clear(this.gun.front());
       /*
       		  4 |  1
@@ -42,36 +53,49 @@
        		  3 |  2
       */
 
-      while (!this.collision(pos)) {
+      pos.x = this.gun.position.x + 1;
+      pos.y = this.gun.position.y + (dx !== 0 ? dy / dx : void 0);
+      while (!this.collided(pos)) {
         switch (false) {
           case dx !== 0:
-            pos.x = this.gun.pos.x;
+            pos.x = this.gun.position.x;
             pos.y = dy > 0 ? this.height : 0;
             break;
           case !(dx > 0 && dy >= 0):
             pos.x += 1;
-            pos.y += dy / dx;
-            break;
-          case !(dx > 0 && dy < 0):
-            pos.x += 1;
-            pos.y += dy / dx;
-            break;
-          case !(dx < 0 && dy <= 0):
-            pos.x -= 1;
-            pos.y -= dy / dx;
+            pos.y += slope;
             break;
           case !(dx < 0 && dy > 0):
             pos.x -= 1;
-            pos.y -= dy / dx;
+            pos.y -= slope;
             break;
+          case !(dx < 0 && dy <= 0):
+            pos.x -= 1;
+            pos.y -= slope;
+            break;
+          case !(dx > 0 && dy < 0):
+            pos.x += 1;
+            pos.y += slope;
         }
       }
-      return this.laser.addPoint(pos);
+      this.laser.addPoint(pos);
+      m = this.collided(pos);
+      if (m.type === "Mirror") {
+        return ang = m.reflect(pos, this.gun.angle);
+      }
     };
 
-    Board.prototype.collision = function(pos) {
+    Board.prototype.collided = function(pos) {
+      var m, _i, _len, _ref;
       if (pos.x <= 0 || pos.x >= this.width || pos.y <= 0 || pos.y >= this.height) {
         return true;
+      }
+      _ref = this.mirrors;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        m = _ref[_i];
+        if (m.collided(pos)) {
+          return m;
+        }
       }
       return null;
     };
@@ -84,12 +108,12 @@
     };
 
     Board.prototype.draw = function() {
-      var m, _i, _len, _ref;
-      this.context.clearRect(0, 0, this.width, this.height);
+      var mirror, _i, _len, _ref;
+      this.canvas.width = this.canvas.width;
       _ref = this.mirrors;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        m = _ref[_i];
-        m.draw(this.context);
+        mirror = _ref[_i];
+        mirror.draw(this.context);
       }
       this.gun.draw(this.context);
       return this.laser.draw(this.context);
@@ -101,7 +125,7 @@
       _ref = this.mirrors;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         m = _ref[_i];
-        m.turn(1);
+        m.turn(0);
       }
       return setTimeout(function() {
         return _this.animate();

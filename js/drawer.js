@@ -7,14 +7,15 @@
 
     Drawer.prototype.angleMod = Math.PI / 180;
 
-    Drawer.prototype.setOptions = function(context, options) {
+    Drawer.prototype.setOptions = function(context, type, options) {
       var index, j, option, shadowOption, _results;
       _results = [];
       for (index in options) {
         option = options[index];
         switch (index) {
           case "color":
-            _results.push(context.strokeStyle = option);
+            context.strokeStyle = option;
+            _results.push(context.fillStyle = option);
             break;
           case "width":
             _results.push(context.lineWidth = option);
@@ -56,16 +57,57 @@
       if (options == null) {
         options = {};
       }
-      this.setOptions(context, options);
+      context.save();
+      this.setOptions(context, 'stroke', options);
       context.beginPath();
       context.moveTo(start.x, start.y);
       context.lineTo(end.x, end.y);
       context.closePath();
-      return context.stroke();
+      context.stroke();
+      return context.restore();
     };
 
-    Drawer.prototype.rectangle = function(context, type, angle, center, width, height) {
+    Drawer.prototype.distance = function(context, angle, start, distance, options) {
+      if (options == null) {
+        options = {};
+      }
       context.save();
+      this.setOptions(context, 'stroke', options);
+      context.translate(start.x, start.y);
+      context.rotate(angle * this.angleMod);
+      context.beginPath();
+      context.moveTo(0, 0);
+      context.lineTo(distance, distance);
+      context.closePath();
+      context.stroke();
+      return context.restore();
+    };
+
+    Drawer.prototype.path = function(context, points, options) {
+      var p, _i, _len, _ref;
+      if (options == null) {
+        options = {};
+      }
+      context.save();
+      this.setOptions(context, 'stroke', options);
+      context.beginPath();
+      context.moveTo(points[0].x, points[0].y);
+      _ref = points.slice(1);
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        p = _ref[_i];
+        context.lineTo(p.x, p.y);
+      }
+      context.closePath();
+      context.stroke();
+      return context.restore();
+    };
+
+    Drawer.prototype.rectangle = function(context, type, angle, center, width, height, options) {
+      if (options == null) {
+        options = {};
+      }
+      context.save();
+      this.setOptions(context, type, options);
       context.translate(center.x, center.y);
       context.rotate(angle * this.angleMod);
       context.rect(-width / 2, -height / 2, width, height);
@@ -77,9 +119,13 @@
       return context.restore();
     };
 
-    Drawer.prototype.polygon = function(context, type, angle, center, sides, radius) {
+    Drawer.prototype.polygon = function(context, type, angle, center, sides, radius, options) {
       var a, i, _i;
+      if (options == null) {
+        options = {};
+      }
       context.save();
+      this.setOptions(context, type, options);
       context.translate(center.x, center.y);
       context.rotate(angle * this.angleMod);
       a = (Math.PI * 2) / sides;
@@ -94,14 +140,6 @@
       } else {
         context.fill();
       }
-      return context.restore();
-    };
-
-    Drawer.prototype.image = function(context, img, angle, center, width, height) {
-      context.save();
-      context.translate(center.x, center.y);
-      context.rotate(angle * this.angleMod);
-      context.drawImage(img, -width / 2, -height / 2, width, height);
       return context.restore();
     };
 

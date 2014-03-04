@@ -1,6 +1,7 @@
 class Board
 	canvas: null
 	context: null
+	bgContext: null
 	
 	width: 0
 	height: 0
@@ -12,21 +13,28 @@ class Board
 	constructor: (cv) ->
 		@canvas = document.getElementById(cv)
 		@context = @canvas.getContext "2d"
+		bcanvas = document.getElementById('bground')
+		@bgContext = bcanvas.getContext "2d"
 		@width = @canvas.width
 		@height = @canvas.height
-		#@canvas.style.width = window.innerWidth + 'px'
-		#@canvas.style.height = window.innerHeight + 'px'
+
+		@context.fillStyle = 'white'
+		@context.strokeStyle = 'white'
+
+		@bgContext.fillStyle = 'black'
+		@bgContext.fillRect 0, 0, @width, @height
 
 		@gun = new LaserGun {x: @width/2, y: @height/2}, 0
-		@laser = new Laser @gun.pos
+		@laser = new Laser @gun.position
 		@mirrors = []
 
 	shot: (pos) ->
-		dx = pos.x - @gun.pos.x
-		dy = pos.y - @gun.pos.y
+		dx = pos.x - @gun.position.x
+		dy = pos.y - @gun.position.y
+		slope = dy/dx
 
 		@gun.angle = Math.atan2(dy, dx) * 180 / Math.PI
-		#console.log @gun.angle, dy/dx
+		console.log @gun.angle, slope
 		
 		@laser.clear(@gun.front())
 
@@ -35,36 +43,43 @@ class Board
  		---------
  		  3 |  2
 		###
-
-		while ! @collision(pos)
+		pos.x = @gun.position.x + 1
+		pos.y = @gun.position.y + (if dx != 0 then dy/dx)
+		while ! @collided(pos)
 			switch
 				#Slope is Infinity
 				when dx is 0
-					pos.x = @gun.pos.x
+					pos.x = @gun.position.x
 					pos.y = if dy > 0 then @height else 0
 				# 1st Quadrant
 				when dx > 0 and dy >= 0
 					pos.x += 1
-					pos.y += dy/dx
-				# 4rd Quadrant
-				when dx > 0 and dy < 0
-					pos.x += 1
-					pos.y += dy/dx
-				# 3rd Quadrant
-				when dx < 0 and dy <= 0
-					pos.x -= 1
-					pos.y -= dy/dx
+					pos.y += slope
 				# 2nd Quadrant
 				when dx < 0 and dy > 0
 					pos.x -= 1
-					pos.y -= dy/dx
-				else
+					pos.y -= slope
+				# 3rd Quadrant
+				when dx < 0 and dy <= 0
+					pos.x -= 1
+					pos.y -= slope
+				# 4rd Quadrant
+				when dx > 0 and dy < 0
+					pos.x += 1
+					pos.y += slope
 
 		@laser.addPoint pos
+		m = @collided(pos)
+		if m.type is "Mirror"
+			ang = m.reflect(pos, @gun.angle)
 
-	collision: (pos) ->
+	#shot: (pos) ->
+
+	collided: (pos) ->
 		if pos.x <= 0 or pos.x >= @width or pos.y <= 0 or pos.y >= @height
 			return true
+		for m in @mirrors
+			return m if m.collided(pos)
 		return null
 
 
@@ -72,15 +87,17 @@ class Board
 		@mirrors.push new PlaneMirror pos, angle
 
 	draw: () ->
-		@context.clearRect 0, 0, @width, @height
-		for m in @mirrors
-			m.draw @context
+		@canvas.width = @canvas.width
+
+		mirror.draw @context for mirror in @mirrors
 		@gun.draw @context
 		@laser.draw @context
 
+
+
 	animate: () ->
 		for m in @mirrors
-			m.turn 1
+			m.turn 0
 		setTimeout => 
 			@animate()
 		, 1000/100
