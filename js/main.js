@@ -44,6 +44,7 @@
       dx = pos.x - this.gun.position.x;
       dy = pos.y - this.gun.position.y;
       slope = dy / dx;
+      this.shoted = true;
       this.gun.angle = Math.atan2(dy, dx) * 180 / Math.PI;
       console.log(this.gun.angle, slope);
       this.laser.clear(this.gun.front());
@@ -53,34 +54,20 @@
        		  3 |  2
       */
 
-      pos.x = this.gun.position.x + 1;
-      pos.y = this.gun.position.y + (dx !== 0 ? dy / dx : void 0);
-      while (!this.collided(pos)) {
-        switch (false) {
-          case dx !== 0:
-            pos.x = this.gun.position.x;
-            pos.y = dy > 0 ? this.height : 0;
-            break;
-          case !(dx > 0 && dy >= 0):
-            pos.x += 1;
-            pos.y += slope;
-            break;
-          case !(dx < 0 && dy > 0):
-            pos.x -= 1;
-            pos.y -= slope;
-            break;
-          case !(dx < 0 && dy <= 0):
-            pos.x -= 1;
-            pos.y -= slope;
-            break;
-          case !(dx > 0 && dy < 0):
-            pos.x += 1;
-            pos.y += slope;
+      pos.x = this.gun.front().x;
+      pos.y = this.gun.front().y;
+      if (!this.collided(pos)) {
+        if (dx === 0) {
+          pos.x = this.laser.last().x;
+          pos.y += dy > 0 ? 1 : -1;
+        } else {
+          pos.x += dx > 0 ? 1 : -1;
+          pos.y += dx > 0 ? dy / dx : -dy / dx;
         }
+        this.laser.last(pos);
       }
-      this.laser.addPoint(pos);
       m = this.collided(pos);
-      if (m.type === "Mirror") {
+      if ((m != null) && m.type === "Mirror") {
         return ang = m.reflect(pos, this.gun.angle);
       }
     };
@@ -120,16 +107,28 @@
     };
 
     Board.prototype.animate = function() {
-      var m, _i, _len, _ref,
+      var dx, dy, m, pos, _i, _len, _ref, _ref1,
         _this = this;
-      _ref = this.mirrors;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        m = _ref[_i];
+      pos = this.laser.last();
+      if (!this.collided(pos) && this.shoted) {
+        _ref = this.laser.changeRate(), dx = _ref[0], dy = _ref[1];
+        if (dx === 0) {
+          pos.x = this.laser.last().x;
+          pos.y += dy > 0 ? 1 : -1;
+        } else {
+          pos.x += dx > 0 ? 5 : -5;
+          pos.y += dx > 0 ? 5 * dy / dx : -5 * dy / dx;
+        }
+        this.laser.last(pos);
+      }
+      _ref1 = this.mirrors;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        m = _ref1[_i];
         m.turn(0);
       }
       return setTimeout(function() {
         return _this.animate();
-      }, 1000 / 100);
+      }, 1000 / 1000);
     };
 
     return Board;

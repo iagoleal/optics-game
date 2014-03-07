@@ -71,10 +71,23 @@ class Laser
 	addPoint: (p) ->
 		@path.push p
 
-	end: (p) -> 
-		a = @path[@path.length-1]
-		@path[@path.length] = p if p?
-		return a
+	last: (p) -> 
+		if p
+			if @path.length > 1
+				@path[@path.length-1] = p
+			else
+				@path[@path.length] = p
+		return @path[@path.length-1]
+
+	changeRate: (start=@path.length-2, end=@path.length-1) ->
+		start = @path.length - start if start < 0
+		end = @path.length - end if end < 0
+		console.log start, end, @path.length
+		if start < @path.length and end < @path.length
+			dx = @path[end].x - @path[start].x
+			dy = @path[end].y - @path[start].y
+			return [dx, dy, dy/dx]
+		return []
 
 	clear: (origin) ->
 		@path = []

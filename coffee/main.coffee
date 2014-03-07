@@ -33,44 +33,31 @@ class Board
 		dy = pos.y - @gun.position.y
 		slope = dy/dx
 
+		@shoted = true
 		@gun.angle = Math.atan2(dy, dx) * 180 / Math.PI
 		console.log @gun.angle, slope
 		
-		@laser.clear(@gun.front())
+		@laser.clear @gun.front()
 
 		###
 		  4 |  1
  		---------
  		  3 |  2
 		###
-		pos.x = @gun.position.x + 1
-		pos.y = @gun.position.y + (if dx != 0 then dy/dx)
-		while ! @collided(pos)
-			switch
-				#Slope is Infinity
-				when dx is 0
-					pos.x = @gun.position.x
-					pos.y = if dy > 0 then @height else 0
-				# 1st Quadrant
-				when dx > 0 and dy >= 0
-					pos.x += 1
-					pos.y += slope
-				# 2nd Quadrant
-				when dx < 0 and dy > 0
-					pos.x -= 1
-					pos.y -= slope
-				# 3rd Quadrant
-				when dx < 0 and dy <= 0
-					pos.x -= 1
-					pos.y -= slope
-				# 4rd Quadrant
-				when dx > 0 and dy < 0
-					pos.x += 1
-					pos.y += slope
+		pos.x = @gun.front().x
+		pos.y = @gun.front().y
+		if ! @collided(pos)
+			#Slope is Infinity
+			if dx is 0
+				pos.x = @laser.last().x
+				pos.y += if dy > 0 then 1 else -1
+			else
+				pos.x += if dx > 0 then 1 else -1
+				pos.y += if dx > 0 then dy/dx else -dy/dx
 
-		@laser.addPoint pos
+			@laser.last pos
 		m = @collided(pos)
-		if m.type is "Mirror"
+		if m? and m.type is "Mirror"
 			ang = m.reflect(pos, @gun.angle)
 
 	#shot: (pos) ->
@@ -96,11 +83,23 @@ class Board
 
 
 	animate: () ->
+		pos = @laser.last()
+		if ! @collided(pos) and @shoted
+			[dx, dy] = @laser.changeRate()
+			#Slope is Infinity
+			if dx is 0
+				pos.x = @laser.last().x
+				pos.y += if dy > 0 then 1 else -1
+			else
+				pos.x += if dx > 0 then 5 else -5
+				pos.y += if dx > 0 then 5*dy/dx else -5*dy/dx
+
+			@laser.last pos
 		for m in @mirrors
 			m.turn 0
 		setTimeout => 
 			@animate()
-		, 1000/100
+		, 1000/1000
 
 
 window.onload = () ->

@@ -162,13 +162,38 @@
       return this.path.push(p);
     };
 
-    Laser.prototype.end = function(p) {
-      var a;
-      a = this.path[this.path.length - 1];
-      if (p != null) {
-        this.path[this.path.length] = p;
+    Laser.prototype.last = function(p) {
+      if (p) {
+        if (this.path.length > 1) {
+          this.path[this.path.length - 1] = p;
+        } else {
+          this.path[this.path.length] = p;
+        }
       }
-      return a;
+      return this.path[this.path.length - 1];
+    };
+
+    Laser.prototype.changeRate = function(start, end) {
+      var dx, dy;
+      if (start == null) {
+        start = this.path.length - 2;
+      }
+      if (end == null) {
+        end = this.path.length - 1;
+      }
+      if (start < 0) {
+        start = this.path.length - start;
+      }
+      if (end < 0) {
+        end = this.path.length - end;
+      }
+      console.log(start, end, this.path.length);
+      if (start < this.path.length && end < this.path.length) {
+        dx = this.path[end].x - this.path[start].x;
+        dy = this.path[end].y - this.path[start].y;
+        return [dx, dy, dy / dx];
+      }
+      return [];
     };
 
     Laser.prototype.clear = function(origin) {
