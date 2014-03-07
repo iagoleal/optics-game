@@ -61,20 +61,21 @@
           this.laser.advance(1);
           a = this.collided(this.laser.last());
           if (a && a.type === "Mirror") {
-            this.curve(a);
+            this.reflect(a);
           }
         }
         return this.laser.path[0] = this.gun.front();
       }
     };
 
-    Board.prototype.curve = function(mirror) {
-      var angle, dx, dy, pos, _ref;
+    Board.prototype.reflect = function(mirror) {
+      var angle, dx, dy, pos, slope, _ref;
       _ref = this.laser.changeRate(), dy = _ref[0], dx = _ref[1];
       angle = mirror.reflect(this.laser.angle());
       pos = this.laser.last();
-      pos.x += dx > 0 ? 1 : -1;
-      pos.y += 10 * Math.tan(angle * Math.PI / 180);
+      slope = Math.abs(Math.tan(angle * Math.PI / 180));
+      pos.x += dx > 0 ? 10 : -10;
+      pos.y += dy > 0 ? -10 * slope : 10 * slope;
       return this.laser.addPoint(pos);
     };
 
@@ -103,24 +104,28 @@
     Board.prototype.draw = function() {
       var mirror, _i, _len, _ref;
       this.canvas.width = this.canvas.width;
-      this.laser.draw(this.context);
       _ref = this.mirrors;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         mirror = _ref[_i];
         mirror.draw(this.context);
       }
-      return this.gun.draw(this.context);
+      this.gun.draw(this.context);
+      return this.laser.draw(this.context);
     };
 
     Board.prototype.animate = function() {
-      var coll, m, _i, _len, _ref,
+      var coll, i, m, _i, _len, _ref,
         _this = this;
       coll = this.collided(this.laser.last());
       if (!coll && this.shoted) {
-        this.laser.advance(10);
+        i = 0;
+        while (!coll && i < 5) {
+          this.laser.advance(1);
+          i++;
+        }
       } else {
         if (coll && coll.type === "Mirror") {
-          this.curve(coll);
+          this.reflect(coll);
         } else {
           this.shoted = false;
           this.recalculate();
@@ -146,19 +151,19 @@
     window.board.addMirror({
       x: 600,
       y: 70
-    }, 30);
+    }, 0);
     window.board.addMirror({
       x: 200,
       y: 70
-    }, 330);
+    }, 0);
     window.board.addMirror({
       x: 200,
       y: 600 - 70
-    }, 210);
+    }, 180);
     window.board.addMirror({
       x: 600,
       y: 600 - 70
-    }, 150);
+    }, 180);
     window.board.animate();
     document.getElementById('board').addEventListener('click', function(e) {
       var pos;

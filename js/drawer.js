@@ -20,6 +20,9 @@
           case "width":
             _results.push(context.lineWidth = option);
             break;
+          case "join":
+            _results.push(context.lineJoin = option);
+            break;
           case "shadow":
             _results.push((function() {
               var _results1;
@@ -97,6 +100,7 @@
         p = _ref[_i];
         context.lineTo(p.x, p.y);
       }
+      context.closePath();
       context.stroke();
       return context.restore();
     };

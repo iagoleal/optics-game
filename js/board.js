@@ -69,7 +69,12 @@
     };
 
     PlaneMirror.prototype.reflect = function(ang) {
-      return 360 - (ang + 2 * this.angle);
+      var mangle;
+      mangle = this.angle;
+      if (mangle >= 180) {
+        mangle -= 180;
+      }
+      return ang + 2 * mangle;
     };
 
     PlaneMirror.prototype.draw = function(context) {
@@ -241,6 +246,7 @@
             color: '#ddeeff',
             width: 5,
             shadow: {
+              join: "bevel",
               color: '#a00',
               offsetX: 0,
               offsetY: 0,

@@ -9,6 +9,8 @@ class Drawer
 					context.fillStyle = option
 				when "width"
 					context.lineWidth = option
+				when "join"
+					context.lineJoin = option
 				when "shadow"
 					for j, shadowOption of option
 						switch j
@@ -62,7 +64,7 @@ class Drawer
 		context.moveTo points[0].x, points[0].y
 		for p in points[1..]
 			context.lineTo p.x, p.y
-		#context.closePath()
+		context.closePath()
 
 		context.stroke()
 

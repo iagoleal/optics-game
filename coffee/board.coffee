@@ -37,7 +37,11 @@ class PlaneMirror extends Mirror
 		# Collision works, but only on static mirror
 		# Need to recalculate collision point every time laser is shoot
 
-	reflect: (ang) -> 360 - (ang + 2*@angle)
+	reflect: (ang) -> 
+		mangle = @angle
+		mangle -= 180 if mangle >= 180
+		#mangle -= 90 if mangle >= 90
+		return (ang + 2*mangle)
 
 	draw: (context) ->
 		drawer.rectangle context, "fill", @angle, @position, @width, @height, {color: 'black', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
@@ -118,7 +122,7 @@ class Laser
 		if @path.length > 1
 			p1 = @path[0]
 			for p2 in @path[1..]
-				drawer.line context, p1, p2, {color: '#ddeeff', width: 5, shadow: {color: '#a00', offsetX: 0, offsetY: 0, blur: 25}}
+				drawer.line context, p1, p2, {color: '#ddeeff', width: 5, shadow: {join: "bevel", color: '#a00', offsetX: 0, offsetY: 0, blur: 25}}
 				p1 = p2
 
 window.PlaneMirror = PlaneMirror
