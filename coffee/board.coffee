@@ -37,10 +37,8 @@ class PlaneMirror extends Mirror
 		# Collision works, but only on static mirror
 		# Need to recalculate collision point every time laser is shoot
 
-	reflect: (point, ang) ->
-		if @collided point
-			return 360 - ang - 2*@angle 
-		return null
+	reflect: (ang) -> 360 - (ang + 2*@angle)
+
 	draw: (context) ->
 		drawer.rectangle context, "fill", @angle, @position, @width, @height, {color: 'black', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
 		drawer.distance context, (45+@angle), @position, 100, {color: 'white'}
@@ -71,22 +69,28 @@ class Laser
 	addPoint: (p) ->
 		@path.push p
 
+	angle: (point=-1) ->
+		[dy, dx] = @changeRate(point)
+
+		return Math.atan2(dy, dx) *180/Math.PI
+
+	changeRate: (point=-1) ->
+		point = @path.length + point if point < 0
+		if point < @path.length and point > 0
+			dx = @path[point].x - @path[point-1].x
+			dy = @path[point].y - @path[point-1].y
+
+			return [dy, dx]
+		return [0, 0]
+
 	last: (p) -> 
 		if p
 			if @path.length > 1
 				@path[@path.length-1] = p
 			else
 				@path[@path.length] = p
-		return @path[@path.length-1]
-
-	changeRate: (start=@path.length-2, end=@path.length-1) ->
-		start = @path.length - start if start < 0
-		end = @path.length - end if end < 0
-		if start < @path.length and end < @path.length
-			dx = @path[end].x - @path[start].x
-			dy = @path[end].y - @path[start].y
-			return [dx, dy]
-		return []
+		x: @path[@path.length-1].x
+		y: @path[@path.length-1].y
 
 	advance: (rate=10) ->
 		pos = @path[@path.length-1]
@@ -105,14 +109,17 @@ class Laser
 			pos.x += if dx > 0 then rate else -rate
 			pos.y += if dx > 0 then rate*dy/dx else -rate*dy/dx
 		@last pos
-	clear: (origin) ->
+
+	clear: () ->
 		@path = []
-		@path.push(origin) if origin
+		@path.push point for point in arguments
 
 	draw: (context) ->
 		if @path.length > 1
-			drawer.path context, @path, {color: '#ddeeff', width: 5, shadow: {color: '#a00', offsetX: 0, offsetY: 0, blur: 25}}
-
+			p1 = @path[0]
+			for p2 in @path[1..]
+				drawer.line context, p1, p2, {color: '#ddeeff', width: 5, shadow: {color: '#a00', offsetX: 0, offsetY: 0, blur: 25}}
+				p1 = p2
 
 window.PlaneMirror = PlaneMirror
 window.LaserGun = LaserGun

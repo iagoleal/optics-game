@@ -40,29 +40,36 @@ class Board
 		# Debug only
 		console.log @gun.angle, dy/dx
 		
-		@laser.clear @gun.position
-
-		@laser.last @gun.front()
+		@laser.clear @gun.position, @gun.front()
 		@laser.advance()
 		@laser.path[0] = @gun.front()
 
-		m = @collided(pos)
-		if m? and m.type is "Mirror"
-			ang = m.reflect(pos, @gun.angle)
 
 	recalculate: () ->
 		if @laser.path.length >= 2
-			@laser.clear @gun.position
-			@laser.last @gun.front()
-			while ! @collided(@laser.last())
+			@laser.clear @gun.position, @gun.front()
+
+			while @collided(@laser.last()) != "wall"
 				@laser.advance(1)
+				a = @collided(@laser.last())
+				if a and a.type is "Mirror"
+					@curve a
 		
 			@laser.path[0] = @gun.front()
+		
+	curve: (mirror) ->
+		[dy, dx] = @laser.changeRate()
+
+		angle = mirror.reflect @laser.angle()
+		pos = @laser.last()
+		pos.x += if dx > 0 then 1 else -1
+		pos.y += 10*Math.tan(angle*Math.PI/180)
+		@laser.addPoint pos
 
 
 	collided: (pos) ->
 		if pos.x <= 0 or pos.x >= @width or pos.y <= 0 or pos.y >= @height
-			return true
+			return "wall"
 		for m in @mirrors
 			return m if m.collided(pos)
 		return null
@@ -74,30 +81,37 @@ class Board
 	draw: () ->
 		@canvas.width = @canvas.width
 
+		@laser.draw @context
 		mirror.draw @context for mirror in @mirrors
 		@gun.draw @context
-		@laser.draw @context
 
 
 
 	animate: () ->
-		# Get the position of the laser's end
-		# Every time loop is executed, the laser advances a little bit
-		if ! @collided(@laser.last()) and @shoted
-			@laser.advance()
-		else 
-			@shoted = false
-			@recalculate()
+		# Every time function is executed, the laser advances a little bit
+		coll = @collided(@laser.last())
+		if ! coll and @shoted
+			@laser.advance(10)
+		else # if laser animation is finished, just do the laser maintenance
+			if coll and coll.type is "Mirror"
+				@curve(coll)
+
+			else
+				@shoted = false# if @collided(@laser.last()) is "wall"
+				@recalculate()
 		for m in @mirrors
-			m.turn 1
+			m.turn 0
 		setTimeout => 
 			@animate()
-		, 1000/100
+		, 1000/1000
 
 
 window.onload = () ->
 	window.board = new Board "board"
-	window.board.addMirror {x: 100, y: 100}, 0
+	window.board.addMirror {x: 600, y: 70}, 30
+	window.board.addMirror {x: 200, y: 70}, 330
+	window.board.addMirror {x: 200, y: 600-70}, 210 
+	window.board.addMirror {x: 600, y: 600-70}, 150
 	window.board.animate()
 
 	#Click Event

@@ -97,7 +97,6 @@
         p = _ref[_i];
         context.lineTo(p.x, p.y);
       }
-      context.closePath();
       context.stroke();
       return context.restore();
     };

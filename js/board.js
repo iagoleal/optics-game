@@ -68,11 +68,8 @@
       return this.position.x - this.width / 2 <= rx && this.position.x + this.width / 2 >= rx && this.position.y - this.height / 2 <= ry && this.position.y + this.height / 2 >= ry;
     };
 
-    PlaneMirror.prototype.reflect = function(point, ang) {
-      if (this.collided(point)) {
-        return 360 - ang - 2 * this.angle;
-      }
-      return null;
+    PlaneMirror.prototype.reflect = function(ang) {
+      return 360 - (ang + 2 * this.angle);
     };
 
     PlaneMirror.prototype.draw = function(context) {
@@ -162,6 +159,31 @@
       return this.path.push(p);
     };
 
+    Laser.prototype.angle = function(point) {
+      var dx, dy, _ref5;
+      if (point == null) {
+        point = -1;
+      }
+      _ref5 = this.changeRate(point), dy = _ref5[0], dx = _ref5[1];
+      return Math.atan2(dy, dx) * 180 / Math.PI;
+    };
+
+    Laser.prototype.changeRate = function(point) {
+      var dx, dy;
+      if (point == null) {
+        point = -1;
+      }
+      if (point < 0) {
+        point = this.path.length + point;
+      }
+      if (point < this.path.length && point > 0) {
+        dx = this.path[point].x - this.path[point - 1].x;
+        dy = this.path[point].y - this.path[point - 1].y;
+        return [dy, dx];
+      }
+      return [0, 0];
+    };
+
     Laser.prototype.last = function(p) {
       if (p) {
         if (this.path.length > 1) {
@@ -170,29 +192,10 @@
           this.path[this.path.length] = p;
         }
       }
-      return this.path[this.path.length - 1];
-    };
-
-    Laser.prototype.changeRate = function(start, end) {
-      var dx, dy;
-      if (start == null) {
-        start = this.path.length - 2;
-      }
-      if (end == null) {
-        end = this.path.length - 1;
-      }
-      if (start < 0) {
-        start = this.path.length - start;
-      }
-      if (end < 0) {
-        end = this.path.length - end;
-      }
-      if (start < this.path.length && end < this.path.length) {
-        dx = this.path[end].x - this.path[start].x;
-        dy = this.path[end].y - this.path[start].y;
-        return [dx, dy];
-      }
-      return [];
+      return {
+        x: this.path[this.path.length - 1].x,
+        y: this.path[this.path.length - 1].y
+      };
     };
 
     Laser.prototype.advance = function(rate) {
@@ -215,25 +218,38 @@
       return this.last(pos);
     };
 
-    Laser.prototype.clear = function(origin) {
+    Laser.prototype.clear = function() {
+      var point, _i, _len, _results;
       this.path = [];
-      if (origin) {
-        return this.path.push(origin);
+      _results = [];
+      for (_i = 0, _len = arguments.length; _i < _len; _i++) {
+        point = arguments[_i];
+        _results.push(this.path.push(point));
       }
+      return _results;
     };
 
     Laser.prototype.draw = function(context) {
+      var p1, p2, _i, _len, _ref5, _results;
       if (this.path.length > 1) {
-        return drawer.path(context, this.path, {
-          color: '#ddeeff',
-          width: 5,
-          shadow: {
-            color: '#a00',
-            offsetX: 0,
-            offsetY: 0,
-            blur: 25
-          }
-        });
+        p1 = this.path[0];
+        _ref5 = this.path.slice(1);
+        _results = [];
+        for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
+          p2 = _ref5[_i];
+          drawer.line(context, p1, p2, {
+            color: '#ddeeff',
+            width: 5,
+            shadow: {
+              color: '#a00',
+              offsetX: 0,
+              offsetY: 0,
+              blur: 25
+            }
+          });
+          _results.push(p1 = p2);
+        }
+        return _results;
       }
     };
 

@@ -62,7 +62,7 @@ class Drawer
 		context.moveTo points[0].x, points[0].y
 		for p in points[1..]
 			context.lineTo p.x, p.y
-		context.closePath()
+		#context.closePath()
 
 		context.stroke()
 
