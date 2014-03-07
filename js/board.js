@@ -187,13 +187,32 @@
       if (end < 0) {
         end = this.path.length - end;
       }
-      console.log(start, end, this.path.length);
       if (start < this.path.length && end < this.path.length) {
         dx = this.path[end].x - this.path[start].x;
         dy = this.path[end].y - this.path[start].y;
-        return [dx, dy, dy / dx];
+        return [dx, dy];
       }
       return [];
+    };
+
+    Laser.prototype.advance = function(rate) {
+      var dx, dy, pos;
+      if (rate == null) {
+        rate = 10;
+      }
+      pos = this.path[this.path.length - 1];
+      if (!(dy || dx)) {
+        dx = this.path[this.path.length - 1].x - this.path[this.path.length - 2].x;
+        dy = this.path[this.path.length - 1].y - this.path[this.path.length - 2].y;
+      }
+      if (dx === 0) {
+        pos.x = this.last().x;
+        pos.y += dy > 0 ? rate : -rate;
+      } else {
+        pos.x += dx > 0 ? rate : -rate;
+        pos.y += dx > 0 ? rate * dy / dx : -rate * dy / dx;
+      }
+      return this.last(pos);
     };
 
     Laser.prototype.clear = function(origin) {

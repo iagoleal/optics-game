@@ -82,13 +82,29 @@ class Laser
 	changeRate: (start=@path.length-2, end=@path.length-1) ->
 		start = @path.length - start if start < 0
 		end = @path.length - end if end < 0
-		console.log start, end, @path.length
 		if start < @path.length and end < @path.length
 			dx = @path[end].x - @path[start].x
 			dy = @path[end].y - @path[start].y
-			return [dx, dy, dy/dx]
+			return [dx, dy]
 		return []
 
+	advance: (rate=10) ->
+		pos = @path[@path.length-1]
+
+		if !(dy or dx)
+			dx = @path[@path.length-1].x - @path[@path.length-2].x
+			dy = @path[@path.length-1].y - @path[@path.length-2].y
+
+
+
+		#Slope is Infinity
+		if dx is 0
+			pos.x = @last().x
+			pos.y += if dy > 0 then rate else -rate
+		else
+			pos.x += if dx > 0 then rate else -rate
+			pos.y += if dx > 0 then rate*dy/dx else -rate*dy/dx
+		@last pos
 	clear: (origin) ->
 		@path = []
 		@path.push(origin) if origin
