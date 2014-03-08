@@ -49,9 +49,8 @@ class PlaneMirror extends Mirror
 	reflect: (ang) -> 
 		#console.log ang, @angle
 		mangle = @angle
-		mangle += 180 if mangle is 180 or mangle is  0
-		mangle -= 180 if mangle > 180
-		mangle -= 90 if mangle >= 90
+		#mangle += 180 if mangle is 180 or mangle is  0
+		mangle -= 90 if mangle in [0, 90, 180, 270]
 		return  360 - (ang + 2*mangle)
 
 	draw: (context) ->

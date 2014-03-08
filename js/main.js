@@ -181,11 +181,11 @@
     window.board.addMirror({
       x: 600,
       y: 70
-    }, 30);
+    }, 45);
     window.board.addMirror({
       x: 200,
       y: 70
-    }, 330);
+    }, 325);
     window.board.addMirror({
       x: 400,
       y: 70
@@ -193,11 +193,11 @@
     window.board.addMirror({
       x: 200,
       y: 600 - 70
-    }, 210);
+    }, 225);
     window.board.addMirror({
       x: 600,
       y: 600 - 70
-    }, 150);
+    }, 135);
     window.board.addMirror({
       x: 400,
       y: 600 - 70

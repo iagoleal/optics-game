@@ -122,11 +122,11 @@ class Board
 
 window.onload = () ->
 	window.board = new Board "board"
-	window.board.addMirror {x: 600, y: 70}, 30
-	window.board.addMirror {x: 200, y: 70}, 330
+	window.board.addMirror {x: 600, y: 70}, 45
+	window.board.addMirror {x: 200, y: 70}, 325
 	window.board.addMirror {x: 400, y: 70}, 0
-	window.board.addMirror {x: 200, y: 600-70}, 210
-	window.board.addMirror {x: 600, y: 600-70}, 150
+	window.board.addMirror {x: 200, y: 600-70}, 225
+	window.board.addMirror {x: 600, y: 600-70}, 135
 	window.board.addMirror {x: 400, y: 600-70}, 180
 
 	window.board.addMirror {x: 700, y: 300}, 90

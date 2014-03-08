@@ -91,13 +91,7 @@
     PlaneMirror.prototype.reflect = function(ang) {
       var mangle;
       mangle = this.angle;
-      if (mangle === 180 || mangle === 0) {
-        mangle += 180;
-      }
-      if (mangle > 180) {
-        mangle -= 180;
-      }
-      if (mangle >= 90) {
+      if (mangle === 0 || mangle === 90 || mangle === 180 || mangle === 270) {
         mangle -= 90;
       }
       return 360 - (ang + 2 * mangle);
