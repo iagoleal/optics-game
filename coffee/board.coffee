@@ -21,10 +21,14 @@ class Turnable
 			@angle += 360
 		return this
 
+	collided: (point) ->
+	draw: (context) ->
+
 class Mirror extends Turnable
 	img: null
 	type: "Mirror"
 
+	reflect: (ang) ->
 
 class PlaneMirror extends Mirror
 	width: 100
@@ -43,6 +47,7 @@ class PlaneMirror extends Mirror
 				@position.y + @height/2 >= ry
 
 	reflect: (ang) -> 
+		#console.log ang, @angle
 		mangle = @angle
 		mangle += 180 if mangle is 180 or mangle is  0
 		mangle -= 180 if mangle > 180
@@ -55,7 +60,12 @@ class PlaneMirror extends Mirror
 
 class LaserGun extends Turnable
 	radius: 30
+	laser: null
 	img: null
+
+	constructor: (pos={x:0, y:0},@angle=0) ->
+		super pos, @angle
+		@laser = new Laser @position
 
 	front: () ->
 		x: @position.x + @radius*Math.cos(@angle*Math.PI/180)
@@ -64,31 +74,6 @@ class LaserGun extends Turnable
 	draw: (context) ->
 		drawer.polygon(context, "stroke", @angle, @position, 3, @radius, {width: 1, color:'white'})
 
-class Star
-	radius: 10
-	position: null
-	glow: off
-	type: "Star"
-
-	constructor: (pos={x:0, y:0}, @radius=1) ->
-		@position =
-			x: pos.x
-			y: pos.y
-
-	collided: (point) ->
-		dist2(@position, point) <= @radius*@radius
-
-	draw: (context) ->
-		a = "stroke"
-		shadow = {}
-		if @glow is on
-			a = "fill"
-			shadow.color = '#aaeeff'
-			shadow.offsetX = 0
-			shadow.offsetY = 0
-			shadow.blur = 25
-			#drawer.arc context, a, @position, 0, 360, @radius*1.7, {color: 'rgba(250, 250, 250, 0.2'}
-		drawer.arc context, a, @position, 0, 360, @radius, {color: '#fff', shadow: shadow }
 
 class Laser
 	path: null
@@ -139,6 +124,31 @@ class Laser
 				lineWidth = (i+1)*4-2
 				color = if i is 0 then '#fff' else "rgba(150, 230, 250, 0.2)"
 				drawer.path context, @path, {color: color, width: lineWidth}
+class Star
+	radius: 10
+	position: null
+	glow: off
+	type: "Star"
+
+	constructor: (pos={x:0, y:0}, @radius=1) ->
+		@position =
+			x: pos.x
+			y: pos.y
+
+	collided: (point) ->
+		dist2(@position, point) <= @radius*@radius
+
+	draw: (context) ->
+		a = "stroke"
+		shadow = {}
+		if @glow is on
+			a = "fill"
+			shadow.color = '#aaeeff'
+			shadow.offsetX = 0
+			shadow.offsetY = 0
+			shadow.blur = 25
+			#drawer.arc context, a, @position, 0, 360, @radius*1.7, {color: 'rgba(250, 250, 250, 0.2'}
+		drawer.arc context, a, @position, 0, 360, @radius, {color: '#fff', shadow: shadow }
 
 window.Star = Star
 window.PlaneMirror = PlaneMirror

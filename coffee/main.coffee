@@ -7,7 +7,6 @@ class Board
 	height: 0
 
 	gun: null
-	laser: null
 	mirrors: null
 	stars: null
 
@@ -28,7 +27,6 @@ class Board
 		@bgContext.fillRect 0, 0, @width, @height
 
 		@gun = new LaserGun {x: @width/2, y: @height/2}, 0
-		@laser = new Laser @gun.position
 		@mirrors = []
 		@stars = []
 
@@ -43,33 +41,34 @@ class Board
 		# Debug only
 		console.log @gun.angle, dy/dx
 		
-		@laser.clear @gun.position, @gun.front()
-		@laser.advance()
-		@laser.path[0] = @gun.front()
+		@gun.laser.clear @gun.position, @gun.front()
+		@gun.laser.advance(1)
+		#@gun.laser.path[0] = @gun.front()
 
 
 	recalculate: () ->
-		if @laser.path.length >= 2
-			@laser.clear @gun.position, @gun.front()
+		if @gun.laser.path.length >= 2
+			star.glow = off for star in @stars
+			@gun.laser.clear @gun.position, @gun.front()
 
-			while @collided(@laser.last()) != "wall"
-				@laser.advance(1)
-				a = @collided(@laser.last())
+			while @collided(@gun.laser.last()) != "wall"
+				@gun.laser.advance(1)
+				a = @collided(@gun.laser.last())
 				if a and a.type is "Mirror"
 					@reflect a
 				if a and a.type is "Star"
 					a.glow = on
 		
-			@laser.path[0] = @gun.front()
+			@gun.laser.path[0] = @gun.front()
 		
 	reflect: (mirror) ->
-		angle = mirror.reflect @laser.angle()
-		#console.log @laser.angle(), angle
-		pos = @laser.last()
+		angle = mirror.reflect @gun.laser.angle()
+		#console.log @gun.laser.angle(), angle
+		pos = @gun.laser.last()
 		#slope = Math.abs(Math.tan(angle*Math.PI/180))
 		pos.x -= 20*Math.cos(angle*Math.PI/180)
 		pos.y -= 20*Math.sin(angle*Math.PI/180)
-		@laser.addPoint pos
+		@gun.laser.addPoint pos
 
 
 	collided: (pos) ->
@@ -91,27 +90,28 @@ class Board
 		@canvas.width = @canvas.width
 
 		mirror.draw @context for mirror in @mirrors
-		@laser.draw @context
+		@gun.laser.draw @context
 		star.draw @context for star in @stars
 		@gun.draw @context
 
 
 	animate: () ->
 		# Every time function is executed, the laser advances a little bit
-		coll = @collided(@laser.last())
-		if false and ! coll and @shoted
+		coll = @collided(@gun.laser.last())
+		if ! coll and @shoted
 			i = 0
-			while ! coll and i < 5
-				@laser.advance(1)
+			while ! @collided(@gun.laser.last()) and i < 10
+				@gun.laser.advance(1)
 				i++
 		else # if laser animation is finished, just do the laser maintenance
 			if coll and coll.type is "Mirror"
 				@reflect coll
 			else if coll and coll.type is "Star"
 				coll.glow = on
+				@gun.laser.advance(coll.radius*2)
 			
 			else
-				@shoted = false# if @collided(@laser.last()) is "wall"
+				@shoted = false# if @collided(@gun.laser.last()) is "wall"
 				@recalculate()
 		for m in @mirrors
 			m.turn 0

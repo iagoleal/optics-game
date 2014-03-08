@@ -15,8 +15,6 @@
 
     Board.prototype.gun = null;
 
-    Board.prototype.laser = null;
-
     Board.prototype.mirrors = null;
 
     Board.prototype.stars = null;
@@ -40,7 +38,6 @@
         x: this.width / 2,
         y: this.height / 2
       }, 0);
-      this.laser = new Laser(this.gun.position);
       this.mirrors = [];
       this.stars = [];
     }
@@ -57,18 +54,22 @@
       this.shoted = true;
       this.gun.angle = Math.atan2(dy, dx) * 180 / Math.PI;
       console.log(this.gun.angle, dy / dx);
-      this.laser.clear(this.gun.position, this.gun.front());
-      this.laser.advance();
-      return this.laser.path[0] = this.gun.front();
+      this.gun.laser.clear(this.gun.position, this.gun.front());
+      return this.gun.laser.advance(1);
     };
 
     Board.prototype.recalculate = function() {
-      var a;
-      if (this.laser.path.length >= 2) {
-        this.laser.clear(this.gun.position, this.gun.front());
-        while (this.collided(this.laser.last()) !== "wall") {
-          this.laser.advance(1);
-          a = this.collided(this.laser.last());
+      var a, star, _i, _len, _ref;
+      if (this.gun.laser.path.length >= 2) {
+        _ref = this.stars;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          star = _ref[_i];
+          star.glow = false;
+        }
+        this.gun.laser.clear(this.gun.position, this.gun.front());
+        while (this.collided(this.gun.laser.last()) !== "wall") {
+          this.gun.laser.advance(1);
+          a = this.collided(this.gun.laser.last());
           if (a && a.type === "Mirror") {
             this.reflect(a);
           }
@@ -76,17 +77,17 @@
             a.glow = true;
           }
         }
-        return this.laser.path[0] = this.gun.front();
+        return this.gun.laser.path[0] = this.gun.front();
       }
     };
 
     Board.prototype.reflect = function(mirror) {
       var angle, pos;
-      angle = mirror.reflect(this.laser.angle());
-      pos = this.laser.last();
+      angle = mirror.reflect(this.gun.laser.angle());
+      pos = this.gun.laser.last();
       pos.x -= 20 * Math.cos(angle * Math.PI / 180);
       pos.y -= 20 * Math.sin(angle * Math.PI / 180);
-      return this.laser.addPoint(pos);
+      return this.gun.laser.addPoint(pos);
     };
 
     Board.prototype.collided = function(pos) {
@@ -130,7 +131,7 @@
         mirror = _ref[_i];
         mirror.draw(this.context);
       }
-      this.laser.draw(this.context);
+      this.gun.laser.draw(this.context);
       _ref1 = this.stars;
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         star = _ref1[_j];
@@ -142,11 +143,11 @@
     Board.prototype.animate = function() {
       var coll, i, m, _i, _len, _ref,
         _this = this;
-      coll = this.collided(this.laser.last());
-      if (false && !coll && this.shoted) {
+      coll = this.collided(this.gun.laser.last());
+      if (!coll && this.shoted) {
         i = 0;
-        while (!coll && i < 5) {
-          this.laser.advance(1);
+        while (!this.collided(this.gun.laser.last()) && i < 10) {
+          this.gun.laser.advance(1);
           i++;
         }
       } else {
@@ -154,6 +155,7 @@
           this.reflect(coll);
         } else if (coll && coll.type === "Star") {
           coll.glow = true;
+          this.gun.laser.advance(coll.radius * 2);
         } else {
           this.shoted = false;
           this.recalculate();
