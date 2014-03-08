@@ -23,6 +23,16 @@ class Drawer
 							when "offsetY"
 								context.shadowOffsetY = shadowOption
 
+	arc: (context, type, center, start, end, radius, options={}) ->
+		context.save()
+		@setOptions(context, 'type', options)
+
+		context.beginPath()
+		context.arc center.x, center.y, radius, start*@angleMod, end*@angleMod
+		
+		if type is "stroke" then context.stroke() else context.fill()
+		
+		context.restore()
 
 	line: (context, start, end, options={}) ->
 		context.save()
@@ -49,8 +59,8 @@ class Drawer
 		context.beginPath()
 		context.moveTo 0, 0
 		context.lineTo distance, distance
-		context.stroke()
 		context.closePath()
+		context.stroke()
 		
 
 		context.restore()

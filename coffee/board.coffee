@@ -1,8 +1,16 @@
+dist2 = (p1, p2) ->
+	Math.abs((p1.x-p2.x))*Math.abs((p1.x-p2.x)) + Math.abs((p1.y-p2.y))*Math.abs((p1.y-p2.y))
+
+dist = (p1, p2) -> Math.sqrt(dist2(p1, p2))
+
 class Turnable
 	position: null
 	angle: 0
 
-	constructor: (@position={x:0, y:0},@angle=0) ->
+	constructor: (pos={x:0, y:0},@angle=0) ->
+		@position =
+			x: pos.x
+			y: pos.y
 
 	turn: (dgr) -> 
 		@angle += dgr
@@ -15,13 +23,12 @@ class Turnable
 
 class Mirror extends Turnable
 	img: null
-	width: 100
-	height: 10
 	type: "Mirror"
 
 
-
 class PlaneMirror extends Mirror
+	width: 100
+	height: 10
 
 	collided: (point) ->
 		c = Math.cos(-@angle*Math.PI/180)
@@ -34,8 +41,6 @@ class PlaneMirror extends Mirror
 				@position.x + @width/2 >= rx and 
 				@position.y - @height/2 <= ry and 
 				@position.y + @height/2 >= ry
-		# Collision works, but only on static mirror
-		# Need to recalculate collision point every time laser is shoot
 
 	reflect: (ang) -> 
 		mangle = @angle
@@ -48,10 +53,6 @@ class PlaneMirror extends Mirror
 		drawer.rectangle context, "fill", @angle, @position, @width, @height, {color: 'black', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
 		drawer.distance context, (45+@angle), @position, 100, {color: 'white'}
 
-class ConvexMirror extends Mirror
-
-class ConcaveMirror extends Mirror
-
 class LaserGun extends Turnable
 	radius: 30
 	img: null
@@ -62,6 +63,32 @@ class LaserGun extends Turnable
 
 	draw: (context) ->
 		drawer.polygon(context, "stroke", @angle, @position, 3, @radius, {width: 1, color:'white'})
+
+class Star
+	radius: 10
+	position: null
+	glow: off
+	type: "Star"
+
+	constructor: (pos={x:0, y:0}, @radius=1) ->
+		@position =
+			x: pos.x
+			y: pos.y
+
+	collided: (point) ->
+		dist2(@position, point) <= @radius*@radius
+
+	draw: (context) ->
+		a = "stroke"
+		shadow = {}
+		if @glow is on
+			a = "fill"
+			shadow.color = '#aaeeff'
+			shadow.offsetX = 0
+			shadow.offsetY = 0
+			shadow.blur = 25
+			#drawer.arc context, a, @position, 0, 360, @radius*1.7, {color: 'rgba(250, 250, 250, 0.2'}
+		drawer.arc context, a, @position, 0, 360, @radius, {color: '#fff', shadow: shadow }
 
 class Laser
 	path: null
@@ -113,6 +140,7 @@ class Laser
 				color = if i is 0 then '#fff' else "rgba(150, 230, 250, 0.2)"
 				drawer.path context, @path, {color: color, width: lineWidth}
 
+window.Star = Star
 window.PlaneMirror = PlaneMirror
 window.LaserGun = LaserGun
 window.Laser = Laser

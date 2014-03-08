@@ -56,6 +56,22 @@
       return _results;
     };
 
+    Drawer.prototype.arc = function(context, type, center, start, end, radius, options) {
+      if (options == null) {
+        options = {};
+      }
+      context.save();
+      this.setOptions(context, 'type', options);
+      context.beginPath();
+      context.arc(center.x, center.y, radius, start * this.angleMod, end * this.angleMod);
+      if (type === "stroke") {
+        context.stroke();
+      } else {
+        context.fill();
+      }
+      return context.restore();
+    };
+
     Drawer.prototype.line = function(context, start, end, options) {
       if (options == null) {
         options = {};
@@ -81,8 +97,8 @@
       context.beginPath();
       context.moveTo(0, 0);
       context.lineTo(distance, distance);
-      context.stroke();
       context.closePath();
+      context.stroke();
       return context.restore();
     };
 

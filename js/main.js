@@ -15,9 +15,11 @@
 
     Board.prototype.gun = null;
 
+    Board.prototype.laser = null;
+
     Board.prototype.mirrors = null;
 
-    Board.prototype.laser = null;
+    Board.prototype.stars = null;
 
     Board.prototype.shoted = false;
 
@@ -40,12 +42,18 @@
       }, 0);
       this.laser = new Laser(this.gun.position);
       this.mirrors = [];
+      this.stars = [];
     }
 
     Board.prototype.shot = function(pos) {
-      var dx, dy;
+      var dx, dy, star, _i, _len, _ref;
       dx = pos.x - this.gun.position.x;
       dy = pos.y - this.gun.position.y;
+      _ref = this.stars;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        star = _ref[_i];
+        star.glow = false;
+      }
       this.shoted = true;
       this.gun.angle = Math.atan2(dy, dx) * 180 / Math.PI;
       console.log(this.gun.angle, dy / dx);
@@ -64,6 +72,9 @@
           if (a && a.type === "Mirror") {
             this.reflect(a);
           }
+          if (a && a.type === "Star") {
+            a.glow = true;
+          }
         }
         return this.laser.path[0] = this.gun.front();
       }
@@ -79,15 +90,22 @@
     };
 
     Board.prototype.collided = function(pos) {
-      var m, _i, _len, _ref;
+      var mirror, star, _i, _j, _len, _len1, _ref, _ref1;
       if (pos.x <= 0 || pos.x >= this.width || pos.y <= 0 || pos.y >= this.height) {
         return "wall";
       }
       _ref = this.mirrors;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        m = _ref[_i];
-        if (m.collided(pos)) {
-          return m;
+        mirror = _ref[_i];
+        if (mirror.collided(pos)) {
+          return mirror;
+        }
+      }
+      _ref1 = this.stars;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        star = _ref1[_j];
+        if (star.collided(pos)) {
+          return star;
         }
       }
       return null;
@@ -100,16 +118,25 @@
       return this.mirrors.push(new PlaneMirror(pos, angle));
     };
 
+    Board.prototype.addStar = function(pos, radius) {
+      return this.stars.push(new Star(pos, radius));
+    };
+
     Board.prototype.draw = function() {
-      var mirror, _i, _len, _ref;
+      var mirror, star, _i, _j, _len, _len1, _ref, _ref1;
       this.canvas.width = this.canvas.width;
       _ref = this.mirrors;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         mirror = _ref[_i];
         mirror.draw(this.context);
       }
-      this.gun.draw(this.context);
-      return this.laser.draw(this.context);
+      this.laser.draw(this.context);
+      _ref1 = this.stars;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        star = _ref1[_j];
+        star.draw(this.context);
+      }
+      return this.gun.draw(this.context);
     };
 
     Board.prototype.animate = function() {
@@ -125,6 +152,8 @@
       } else {
         if (coll && coll.type === "Mirror") {
           this.reflect(coll);
+        } else if (coll && coll.type === "Star") {
+          coll.glow = true;
         } else {
           this.shoted = false;
           this.recalculate();
@@ -154,7 +183,7 @@
     window.board.addMirror({
       x: 200,
       y: 70
-    }, 0);
+    }, 330);
     window.board.addMirror({
       x: 400,
       y: 70
@@ -166,6 +195,10 @@
     window.board.addMirror({
       x: 600,
       y: 600 - 70
+    }, 150);
+    window.board.addMirror({
+      x: 400,
+      y: 600 - 70
     }, 180);
     window.board.addMirror({
       x: 700,
@@ -175,6 +208,10 @@
       x: 100,
       y: 300
     }, 270);
+    window.board.addStar({
+      x: 200,
+      y: 350
+    }, 10);
     window.board.animate();
     document.getElementById('board').addEventListener('click', function(e) {
       var pos;

@@ -7,8 +7,9 @@ class Board
 	height: 0
 
 	gun: null
-	mirrors: null
 	laser: null
+	mirrors: null
+	stars: null
 
 	shoted: false
 
@@ -29,11 +30,13 @@ class Board
 		@gun = new LaserGun {x: @width/2, y: @height/2}, 0
 		@laser = new Laser @gun.position
 		@mirrors = []
+		@stars = []
 
 	shot: (pos) ->
 		dx = pos.x - @gun.position.x
 		dy = pos.y - @gun.position.y
 
+		star.glow = off for star in @stars
 		@shoted = true
 		@gun.angle = Math.atan2(dy, dx) * 180 / Math.PI
 		
@@ -54,6 +57,8 @@ class Board
 				a = @collided(@laser.last())
 				if a and a.type is "Mirror"
 					@reflect a
+				if a and a.type is "Star"
+					a.glow = on
 		
 			@laser.path[0] = @gun.front()
 		
@@ -70,21 +75,25 @@ class Board
 	collided: (pos) ->
 		if pos.x <= 0 or pos.x >= @width or pos.y <= 0 or pos.y >= @height
 			return "wall"
-		for m in @mirrors
-			return m if m.collided(pos)
+		return mirror for mirror in @mirrors when mirror.collided(pos)
+		return star for star in @stars when star.collided(pos)
 		return null
 
 
 	addMirror: (pos, angle=0) ->
 		@mirrors.push new PlaneMirror pos, angle
 
+	addStar: (pos, radius) ->
+		@stars.push new Star pos, radius
+
+
 	draw: () ->
 		@canvas.width = @canvas.width
 
 		mirror.draw @context for mirror in @mirrors
-		@gun.draw @context
 		@laser.draw @context
-
+		star.draw @context for star in @stars
+		@gun.draw @context
 
 
 	animate: () ->
@@ -98,6 +107,9 @@ class Board
 		else # if laser animation is finished, just do the laser maintenance
 			if coll and coll.type is "Mirror"
 				@reflect coll
+			else if coll and coll.type is "Star"
+				coll.glow = on
+			
 			else
 				@shoted = false# if @collided(@laser.last()) is "wall"
 				@recalculate()
@@ -111,13 +123,17 @@ class Board
 window.onload = () ->
 	window.board = new Board "board"
 	window.board.addMirror {x: 600, y: 70}, 30
-	window.board.addMirror {x: 200, y: 70}, 0
+	window.board.addMirror {x: 200, y: 70}, 330
 	window.board.addMirror {x: 400, y: 70}, 0
 	window.board.addMirror {x: 200, y: 600-70}, 210
-	window.board.addMirror {x: 600, y: 600-70}, 180
+	window.board.addMirror {x: 600, y: 600-70}, 150
+	window.board.addMirror {x: 400, y: 600-70}, 180
 
 	window.board.addMirror {x: 700, y: 300}, 90
 	window.board.addMirror {x: 100, y: 300}, 270
+
+	window.board.addStar {x: 200, y: 350}, 10
+
 	window.board.animate()
 
 	#Click Event
