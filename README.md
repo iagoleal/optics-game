@@ -4,7 +4,7 @@
 
 + Iago Leal ([@iagoleal](http://github.com/iagoleal/ "Iago Leal"))
 
-+ João Guio ([@joaoguio](http://github.com/joaoguio/ "João Guio"))
++ João Guio ([@jonnyguio](http://github.com/jonnyguio/ "João Guio"))
 
 ## Known Issues:
 
