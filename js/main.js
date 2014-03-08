@@ -31,6 +31,7 @@
       this.height = this.canvas.height;
       this.context.fillStyle = 'white';
       this.context.strokeStyle = 'white';
+      this.context.lineJoin = "bevel";
       this.bgContext.fillStyle = 'black';
       this.bgContext.fillRect(0, 0, this.width, this.height);
       this.gun = new LaserGun({
@@ -69,13 +70,11 @@
     };
 
     Board.prototype.reflect = function(mirror) {
-      var angle, dx, dy, pos, slope, _ref;
-      _ref = this.laser.changeRate(), dy = _ref[0], dx = _ref[1];
+      var angle, pos;
       angle = mirror.reflect(this.laser.angle());
       pos = this.laser.last();
-      slope = Math.abs(Math.tan(angle * Math.PI / 180));
-      pos.x += dx > 0 ? 10 : -10;
-      pos.y += dy > 0 ? -10 * slope : 10 * slope;
+      pos.x -= 20 * Math.cos(angle * Math.PI / 180);
+      pos.y -= 20 * Math.sin(angle * Math.PI / 180);
       return this.laser.addPoint(pos);
     };
 
@@ -117,7 +116,7 @@
       var coll, i, m, _i, _len, _ref,
         _this = this;
       coll = this.collided(this.laser.last());
-      if (!coll && this.shoted) {
+      if (false && !coll && this.shoted) {
         i = 0;
         while (!coll && i < 5) {
           this.laser.advance(1);
@@ -151,19 +150,31 @@
     window.board.addMirror({
       x: 600,
       y: 70
-    }, 0);
+    }, 30);
     window.board.addMirror({
       x: 200,
       y: 70
     }, 0);
     window.board.addMirror({
+      x: 400,
+      y: 70
+    }, 0);
+    window.board.addMirror({
       x: 200,
       y: 600 - 70
-    }, 180);
+    }, 210);
     window.board.addMirror({
       x: 600,
       y: 600 - 70
     }, 180);
+    window.board.addMirror({
+      x: 700,
+      y: 300
+    }, 90);
+    window.board.addMirror({
+      x: 100,
+      y: 300
+    }, 270);
     window.board.animate();
     document.getElementById('board').addEventListener('click', function(e) {
       var pos;

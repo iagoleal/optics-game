@@ -71,10 +71,16 @@
     PlaneMirror.prototype.reflect = function(ang) {
       var mangle;
       mangle = this.angle;
-      if (mangle >= 180) {
+      if (mangle === 180 || mangle === 0) {
+        mangle += 180;
+      }
+      if (mangle > 180) {
         mangle -= 180;
       }
-      return ang + 2 * mangle;
+      if (mangle >= 90) {
+        mangle -= 90;
+      }
+      return 360 - (ang + 2 * mangle);
     };
 
     PlaneMirror.prototype.draw = function(context) {
@@ -204,23 +210,11 @@
     };
 
     Laser.prototype.advance = function(rate) {
-      var dx, dy, pos;
       if (rate == null) {
-        rate = 10;
+        rate = 1;
       }
-      pos = this.path[this.path.length - 1];
-      if (!(dy || dx)) {
-        dx = this.path[this.path.length - 1].x - this.path[this.path.length - 2].x;
-        dy = this.path[this.path.length - 1].y - this.path[this.path.length - 2].y;
-      }
-      if (dx === 0) {
-        pos.x = this.last().x;
-        pos.y += dy > 0 ? rate : -rate;
-      } else {
-        pos.x += dx > 0 ? rate : -rate;
-        pos.y += dx > 0 ? rate * dy / dx : -rate * dy / dx;
-      }
-      return this.last(pos);
+      this.path[this.path.length - 1].x += rate * Math.cos(this.angle() * Math.PI / 180);
+      return this.path[this.path.length - 1].y += rate * Math.sin(this.angle() * Math.PI / 180);
     };
 
     Laser.prototype.clear = function() {
@@ -235,25 +229,16 @@
     };
 
     Laser.prototype.draw = function(context) {
-      var p1, p2, _i, _len, _ref5, _results;
+      var color, i, lineWidth, _i, _results;
       if (this.path.length > 1) {
-        p1 = this.path[0];
-        _ref5 = this.path.slice(1);
         _results = [];
-        for (_i = 0, _len = _ref5.length; _i < _len; _i++) {
-          p2 = _ref5[_i];
-          drawer.line(context, p1, p2, {
-            color: '#ddeeff',
-            width: 5,
-            shadow: {
-              join: "bevel",
-              color: '#a00',
-              offsetX: 0,
-              offsetY: 0,
-              blur: 25
-            }
-          });
-          _results.push(p1 = p2);
+        for (i = _i = 5; _i >= 0; i = --_i) {
+          lineWidth = (i + 1) * 4 - 2;
+          color = i === 0 ? '#fff' : "rgba(150, 230, 250, 0.2)";
+          _results.push(drawer.path(context, this.path, {
+            color: color,
+            width: lineWidth
+          }));
         }
         return _results;
       }

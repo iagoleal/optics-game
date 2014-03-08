@@ -49,9 +49,9 @@ class Drawer
 		context.beginPath()
 		context.moveTo 0, 0
 		context.lineTo distance, distance
+		context.stroke()
 		context.closePath()
 		
-		context.stroke()
 
 		context.restore()
 
@@ -64,9 +64,9 @@ class Drawer
 		context.moveTo points[0].x, points[0].y
 		for p in points[1..]
 			context.lineTo p.x, p.y
-		context.closePath()
 
 		context.stroke()
+		context.closePath()
 
 		context.restore()
 

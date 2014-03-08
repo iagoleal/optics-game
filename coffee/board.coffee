@@ -39,9 +39,10 @@ class PlaneMirror extends Mirror
 
 	reflect: (ang) -> 
 		mangle = @angle
-		mangle -= 180 if mangle >= 180
-		#mangle -= 90 if mangle >= 90
-		return (ang + 2*mangle)
+		mangle += 180 if mangle is 180 or mangle is  0
+		mangle -= 180 if mangle > 180
+		mangle -= 90 if mangle >= 90
+		return  360 - (ang + 2*mangle)
 
 	draw: (context) ->
 		drawer.rectangle context, "fill", @angle, @position, @width, @height, {color: 'black', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
@@ -96,34 +97,21 @@ class Laser
 		x: @path[@path.length-1].x
 		y: @path[@path.length-1].y
 
-	advance: (rate=10) ->
-		pos = @path[@path.length-1]
-
-		if !(dy or dx)
-			dx = @path[@path.length-1].x - @path[@path.length-2].x
-			dy = @path[@path.length-1].y - @path[@path.length-2].y
-
-
-
-		#Slope is Infinity
-		if dx is 0
-			pos.x = @last().x
-			pos.y += if dy > 0 then rate else -rate
-		else
-			pos.x += if dx > 0 then rate else -rate
-			pos.y += if dx > 0 then rate*dy/dx else -rate*dy/dx
-		@last pos
+	advance: (rate=1) ->
+		@path[@path.length-1].x += rate*Math.cos(@angle()*Math.PI/180)
+		@path[@path.length-1].y += rate*Math.sin(@angle()*Math.PI/180)
 
 	clear: () ->
 		@path = []
 		@path.push point for point in arguments
 
+
 	draw: (context) ->
 		if @path.length > 1
-			p1 = @path[0]
-			for p2 in @path[1..]
-				drawer.line context, p1, p2, {color: '#ddeeff', width: 5, shadow: {join: "bevel", color: '#a00', offsetX: 0, offsetY: 0, blur: 25}}
-				p1 = p2
+			for i in [5..0]
+				lineWidth = (i+1)*4-2
+				color = if i is 0 then '#fff' else "rgba(150, 230, 250, 0.2)"
+				drawer.path context, @path, {color: color, width: lineWidth}
 
 window.PlaneMirror = PlaneMirror
 window.LaserGun = LaserGun

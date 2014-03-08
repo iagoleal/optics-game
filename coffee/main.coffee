@@ -22,7 +22,7 @@ class Board
 
 		@context.fillStyle = 'white'
 		@context.strokeStyle = 'white'
-
+		@context.lineJoin = "bevel"
 		@bgContext.fillStyle = 'black'
 		@bgContext.fillRect 0, 0, @width, @height
 
@@ -58,14 +58,12 @@ class Board
 			@laser.path[0] = @gun.front()
 		
 	reflect: (mirror) ->
-		[dy, dx] = @laser.changeRate()
-
 		angle = mirror.reflect @laser.angle()
 		#console.log @laser.angle(), angle
 		pos = @laser.last()
-		slope = Math.abs(Math.tan(angle*Math.PI/180))
-		pos.x += if dx > 0 then 10 else -10
-		pos.y += if dy > 0 then -10*slope else 10*slope
+		#slope = Math.abs(Math.tan(angle*Math.PI/180))
+		pos.x -= 20*Math.cos(angle*Math.PI/180)
+		pos.y -= 20*Math.sin(angle*Math.PI/180)
 		@laser.addPoint pos
 
 
@@ -92,7 +90,7 @@ class Board
 	animate: () ->
 		# Every time function is executed, the laser advances a little bit
 		coll = @collided(@laser.last())
-		if ! coll and @shoted
+		if false and ! coll and @shoted
 			i = 0
 			while ! coll and i < 5
 				@laser.advance(1)
@@ -100,7 +98,6 @@ class Board
 		else # if laser animation is finished, just do the laser maintenance
 			if coll and coll.type is "Mirror"
 				@reflect coll
-
 			else
 				@shoted = false# if @collided(@laser.last()) is "wall"
 				@recalculate()
@@ -113,10 +110,14 @@ class Board
 
 window.onload = () ->
 	window.board = new Board "board"
-	window.board.addMirror {x: 600, y: 70}, 0
+	window.board.addMirror {x: 600, y: 70}, 30
 	window.board.addMirror {x: 200, y: 70}, 0
-	window.board.addMirror {x: 200, y: 600-70}, 180
+	window.board.addMirror {x: 400, y: 70}, 0
+	window.board.addMirror {x: 200, y: 600-70}, 210
 	window.board.addMirror {x: 600, y: 600-70}, 180
+
+	window.board.addMirror {x: 700, y: 300}, 90
+	window.board.addMirror {x: 100, y: 300}, 270
 	window.board.animate()
 
 	#Click Event

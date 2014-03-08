@@ -81,8 +81,8 @@
       context.beginPath();
       context.moveTo(0, 0);
       context.lineTo(distance, distance);
-      context.closePath();
       context.stroke();
+      context.closePath();
       return context.restore();
     };
 
@@ -100,8 +100,8 @@
         p = _ref[_i];
         context.lineTo(p.x, p.y);
       }
-      context.closePath();
       context.stroke();
+      context.closePath();
       return context.restore();
     };
 
