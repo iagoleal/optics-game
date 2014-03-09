@@ -50,7 +50,7 @@ class Board
 			@gun.laser.clear @gun.position, @gun.front()
 
 			a = @collided @gun.laser.last()
-			while !a #or !(a and a.type is "Wall")
+			while !a or !(a and a.type is "Wall")
 				#console.log a.type
 				@gun.laser.advance(1)
 				a = @collided @gun.laser.last() 
@@ -58,10 +58,7 @@ class Board
 					@reflect a
 				if a and a.type is "Star"
 					a.glow = on
-				# This way looks more elegant
-				if a and a.type is "Wall"
-					break
-		
+
 			@gun.laser.path[0] = @gun.front()
 		
 	reflect: (mirror) ->

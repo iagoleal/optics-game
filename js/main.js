@@ -65,7 +65,7 @@
         }
         this.gun.laser.clear(this.gun.position, this.gun.front());
         a = this.collided(this.gun.laser.last());
-        while (!a) {
+        while (!a || !(a && a.type === "Wall")) {
           this.gun.laser.advance(1);
           a = this.collided(this.gun.laser.last());
           if (a && a.type === "Mirror") {
@@ -73,9 +73,6 @@
           }
           if (a && a.type === "Star") {
             a.glow = true;
-          }
-          if (a && a.type === "Wall") {
-            break;
           }
         }
         return this.gun.laser.path[0] = this.gun.front();
