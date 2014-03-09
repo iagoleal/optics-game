@@ -1,7 +1,7 @@
 class Drawer
 	angleMod: Math.PI/180
 
-	setOptions: (context, type, options) ->
+	setOptions: (context, options) ->
 		for index, option of options
 			switch index
 				when "color" 
@@ -25,7 +25,7 @@ class Drawer
 
 	arc: (context, type, center, start, end, radius, options={}) ->
 		context.save()
-		@setOptions(context, 'type', options)
+		@setOptions(context, options)
 
 		context.beginPath()
 		context.arc center.x, center.y, radius, start*@angleMod, end*@angleMod
@@ -37,7 +37,7 @@ class Drawer
 	line: (context, start, end, options={}) ->
 		context.save()
 		
-		@setOptions(context, 'stroke', options)
+		@setOptions(context, options)
 
 		context.beginPath()
 		context.moveTo start.x, start.y
@@ -51,7 +51,7 @@ class Drawer
 	distance: (context, angle, start, distance, options={}) ->
 		context.save()
 
-		@setOptions(context, 'stroke', options)
+		@setOptions(context, options)
 
 		context.translate(start.x, start.y)
 		context.rotate angle*@angleMod
@@ -68,7 +68,7 @@ class Drawer
 	path: (context, points, options={}) ->
 		context.save()
 		
-		@setOptions(context, 'stroke', options)
+		@setOptions(context, options)
 
 		context.beginPath()
 		context.moveTo points[0].x, points[0].y
@@ -83,7 +83,7 @@ class Drawer
 	rectangle: (context, type, angle, center, width, height, options={}) ->
 		context.save()
 
-		@setOptions(context, type, options)
+		@setOptions(context, options)
 
 		context.translate(center.x, center.y)
 		context.rotate angle*@angleMod
@@ -96,7 +96,7 @@ class Drawer
 	polygon: (context, type, angle, center, sides, radius, options={}) ->
 		context.save()
 
-		@setOptions(context, type, options)
+		@setOptions(context, options)
 		
 		context.translate(center.x, center.y)
 		context.rotate (angle)*@angleMod

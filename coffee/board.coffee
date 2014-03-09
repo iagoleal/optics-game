@@ -35,6 +35,7 @@ class PlaneMirror extends Mirror
 	height: 10
 
 	collided: (point) ->
+		#rotated rectangle collision
 		c = Math.cos(-@angle*Math.PI/180)
 		s = Math.sin(-@angle*Math.PI/180)
 

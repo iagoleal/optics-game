@@ -8,6 +8,6 @@
 
 ## Known Issues:
 
-1. THE REFLECTION IS BUGED
-2. Laser perpendicular to two mirrors starts infinite loop.
+1. THE REFLECTION IS BUGED [FIXED (I hope)]
+2. Laser perpendicular to two mirrors starts infinite loop. [FIXED]
 3. Laser is still reflecting on mirrors sides.

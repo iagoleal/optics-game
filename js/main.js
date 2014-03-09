@@ -31,7 +31,7 @@
       this.height = this.canvas.height;
       this.context.fillStyle = 'white';
       this.context.strokeStyle = 'white';
-      this.context.lineJoin = "bevel";
+      this.context.lineJoin = "round";
       this.bgContext.fillStyle = 'black';
       this.bgContext.fillRect(0, 0, this.width, this.height);
       this.gun = new LaserGun({
@@ -176,7 +176,8 @@
   })();
 
   window.onload = function() {
-    var _this = this;
+    var clickTimer, longPress,
+      _this = this;
     window.board = new Board("board");
     window.board.addMirror({
       x: 600,
@@ -215,13 +216,30 @@
       y: 350
     }, 10);
     window.board.animate();
-    document.getElementById('board').addEventListener('click', function(e) {
+    clickTimer = false;
+    longPress = false;
+    document.getElementById('board').addEventListener('mousedown', function(e) {
       var pos;
       pos = {
         x: e.pageX - board.canvas.offsetLeft,
         y: e.pageY - board.canvas.offsetTop
       };
-      return board.shot(pos);
+      return clickTimer = setTimeout(function() {
+        longPress = true;
+        return console.log("BABU");
+      }, 1000);
+    });
+    document.getElementById('board').addEventListener('mouseup', function(e) {
+      var pos;
+      pos = {
+        x: e.pageX - board.canvas.offsetLeft,
+        y: e.pageY - board.canvas.offsetTop
+      };
+      clearTimeout(clickTimer);
+      if (!longPress) {
+        board.shot(pos);
+      }
+      return longPress = false;
     });
     return requestAnimationFrame(mainLoop);
   };

@@ -22,7 +22,7 @@ class Board
 
 		@context.fillStyle = 'white'
 		@context.strokeStyle = 'white'
-		@context.lineJoin = "bevel"
+		@context.lineJoin = "round"
 		@bgContext.fillStyle = 'black'
 		@bgContext.fillRect 0, 0, @width, @height
 
@@ -63,7 +63,7 @@ class Board
 		
 	reflect: (mirror) ->
 		angle = mirror.reflect @gun.laser.angle()
-		#console.log @gun.laser.angle(), angle
+
 		pos = @gun.laser.last()
 		#slope = Math.abs(Math.tan(angle*Math.PI/180))
 		pos.x -= 20*Math.cos(angle*Math.PI/180)
@@ -136,13 +136,27 @@ window.onload = () ->
 
 	window.board.animate()
 
+	clickTimer = false
+	longPress = no
+
 	#Click Event
-	document.getElementById('board').addEventListener 'click', (e) =>
+	document.getElementById('board').addEventListener 'mousedown', (e) =>
 		pos = 
 			x: e.pageX - board.canvas.offsetLeft
 			y: e.pageY - board.canvas.offsetTop
-		
-		board.shot(pos)
+
+		clickTimer = setTimeout -> 
+			longPress = yes
+			console.log "BABU"
+		, 1000
+	document.getElementById('board').addEventListener 'mouseup', (e) =>
+		pos = 
+			x: e.pageX - board.canvas.offsetLeft
+			y: e.pageY - board.canvas.offsetTop
+
+		clearTimeout clickTimer
+		board.shot(pos) unless longPress
+		longPress = no
 
 	requestAnimationFrame(mainLoop)	
 

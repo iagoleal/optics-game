@@ -7,7 +7,7 @@
 
     Drawer.prototype.angleMod = Math.PI / 180;
 
-    Drawer.prototype.setOptions = function(context, type, options) {
+    Drawer.prototype.setOptions = function(context, options) {
       var index, j, option, shadowOption, _results;
       _results = [];
       for (index in options) {
@@ -61,7 +61,7 @@
         options = {};
       }
       context.save();
-      this.setOptions(context, 'type', options);
+      this.setOptions(context, options);
       context.beginPath();
       context.arc(center.x, center.y, radius, start * this.angleMod, end * this.angleMod);
       if (type === "stroke") {
@@ -77,7 +77,7 @@
         options = {};
       }
       context.save();
-      this.setOptions(context, 'stroke', options);
+      this.setOptions(context, options);
       context.beginPath();
       context.moveTo(start.x, start.y);
       context.lineTo(end.x, end.y);
@@ -91,7 +91,7 @@
         options = {};
       }
       context.save();
-      this.setOptions(context, 'stroke', options);
+      this.setOptions(context, options);
       context.translate(start.x, start.y);
       context.rotate(angle * this.angleMod);
       context.beginPath();
@@ -108,7 +108,7 @@
         options = {};
       }
       context.save();
-      this.setOptions(context, 'stroke', options);
+      this.setOptions(context, options);
       context.beginPath();
       context.moveTo(points[0].x, points[0].y);
       _ref = points.slice(1);
@@ -126,7 +126,7 @@
         options = {};
       }
       context.save();
-      this.setOptions(context, type, options);
+      this.setOptions(context, options);
       context.translate(center.x, center.y);
       context.rotate(angle * this.angleMod);
       context.rect(-width / 2, -height / 2, width, height);
@@ -144,7 +144,7 @@
         options = {};
       }
       context.save();
-      this.setOptions(context, type, options);
+      this.setOptions(context, options);
       context.translate(center.x, center.y);
       context.rotate(angle * this.angleMod);
       a = (Math.PI * 2) / sides;
