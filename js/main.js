@@ -7,8 +7,6 @@
 
     Board.prototype.context = null;
 
-    Board.prototype.bgContext = null;
-
     Board.prototype.width = 0;
 
     Board.prototype.height = 0;
@@ -17,28 +15,27 @@
 
     Board.prototype.mirrors = null;
 
+    Board.prototype.obstacles = null;
+
     Board.prototype.stars = null;
 
     Board.prototype.shoted = false;
 
     function Board(cv) {
-      var bcanvas;
       this.canvas = document.getElementById(cv);
       this.context = this.canvas.getContext("2d");
-      bcanvas = document.getElementById('bground');
-      this.bgContext = bcanvas.getContext("2d");
       this.width = this.canvas.width;
       this.height = this.canvas.height;
-      this.context.fillStyle = 'white';
-      this.context.strokeStyle = 'white';
-      this.context.lineJoin = "round";
-      this.bgContext.fillStyle = 'black';
-      this.bgContext.fillRect(0, 0, this.width, this.height);
+      drawer.setOptions(this.context, {
+        color: '#000',
+        join: 'round'
+      });
       this.gun = new LaserGun({
         x: this.width / 2,
         y: this.height / 2
       }, 0);
       this.mirrors = [];
+      this.obstacles = [];
       this.stars = [];
     }
 
@@ -67,7 +64,8 @@
           star.glow = false;
         }
         this.gun.laser.clear(this.gun.position, this.gun.front());
-        while (this.collided(this.gun.laser.last()) !== "wall") {
+        a = this.collided(this.gun.laser.last());
+        while (!a) {
           this.gun.laser.advance(1);
           a = this.collided(this.gun.laser.last());
           if (a && a.type === "Mirror") {
@@ -75,6 +73,9 @@
           }
           if (a && a.type === "Star") {
             a.glow = true;
+          }
+          if (a && a.type === "Wall") {
+            break;
           }
         }
         return this.gun.laser.path[0] = this.gun.front();
@@ -91,20 +92,29 @@
     };
 
     Board.prototype.collided = function(pos) {
-      var mirror, star, _i, _j, _len, _len1, _ref, _ref1;
+      var mirror, obstacle, star, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
       if (pos.x <= 0 || pos.x >= this.width || pos.y <= 0 || pos.y >= this.height) {
-        return "wall";
+        return {
+          type: "Wall"
+        };
       }
-      _ref = this.mirrors;
+      _ref = this.obstacles;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        mirror = _ref[_i];
+        obstacle = _ref[_i];
+        if (obstacle.collided(pos)) {
+          return obstacle;
+        }
+      }
+      _ref1 = this.mirrors;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        mirror = _ref1[_j];
         if (mirror.collided(pos)) {
           return mirror;
         }
       }
-      _ref1 = this.stars;
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        star = _ref1[_j];
+      _ref2 = this.stars;
+      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+        star = _ref2[_k];
         if (star.collided(pos)) {
           return star;
         }
@@ -112,9 +122,12 @@
       return null;
     };
 
-    Board.prototype.addMirror = function(pos, angle) {
+    Board.prototype.addMirror = function(pos, angle, width) {
       if (angle == null) {
         angle = 0;
+      }
+      if (width == null) {
+        width = 100;
       }
       return this.mirrors.push(new PlaneMirror(pos, angle));
     };
@@ -123,21 +136,34 @@
       return this.stars.push(new Star(pos, radius));
     };
 
+    Board.prototype.addWall = function(pos, angle, width) {
+      if (angle == null) {
+        angle = 0;
+      }
+      return this.obstacles.push(new Wall(pos, angle, width));
+    };
+
     Board.prototype.draw = function() {
-      var mirror, star, _i, _j, _len, _len1, _ref, _ref1;
+      var mirror, obstacle, star, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
       this.canvas.width = this.canvas.width;
+      this.context.fillRect(0, 0, this.width, this.height);
       _ref = this.mirrors;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         mirror = _ref[_i];
         mirror.draw(this.context);
       }
-      this.gun.laser.draw(this.context);
-      _ref1 = this.stars;
+      _ref1 = this.obstacles;
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        star = _ref1[_j];
+        obstacle = _ref1[_j];
+        obstacle.draw(this.context);
+      }
+      this.gun.draw(this.context);
+      _ref2 = this.stars;
+      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+        star = _ref2[_k];
         star.draw(this.context);
       }
-      return this.gun.draw(this.context);
+      return this.gun.laser.draw(this.context);
     };
 
     Board.prototype.animate = function() {
@@ -207,10 +233,10 @@
       x: 700,
       y: 300
     }, 90);
-    window.board.addMirror({
+    window.board.addWall({
       x: 100,
       y: 300
-    }, 270);
+    }, 270, 100);
     window.board.addStar({
       x: 200,
       y: 350

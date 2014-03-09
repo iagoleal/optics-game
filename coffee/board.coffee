@@ -24,15 +24,13 @@ class Turnable
 	collided: (point) ->
 	draw: (context) ->
 
-class Mirror extends Turnable
-	img: null
-	type: "Mirror"
-
-	reflect: (ang) ->
-
-class PlaneMirror extends Mirror
+class Rectangle extends Turnable
 	width: 100
 	height: 10
+
+	constructor: (pos={x:0, y:0}, @angle=0,  @width=100) ->
+		super pos, angle
+
 
 	collided: (point) ->
 		#rotated rectangle collision
@@ -47,10 +45,17 @@ class PlaneMirror extends Mirror
 				@position.y - @height/2 <= ry and 
 				@position.y + @height/2 >= ry
 
+	draw: (context) ->
+		drawer.rectangle context, "fill", @angle, @position, @width, @height, {color: 'white'}
+
+class Wall extends Rectangle
+	type: "Wall"
+
+class PlaneMirror extends Rectangle
+	type: "Mirror"
+
 	reflect: (ang) -> 
-		#console.log ang, @angle
 		mangle = @angle
-		#mangle += 180 if mangle is 180 or mangle is  0
 		mangle -= 90 if mangle in [0, 90, 180, 270]
 		return  360 - (ang + 2*mangle)
 
@@ -153,4 +158,4 @@ class Star
 window.Star = Star
 window.PlaneMirror = PlaneMirror
 window.LaserGun = LaserGun
-window.Laser = Laser
+window.Wall = Wall

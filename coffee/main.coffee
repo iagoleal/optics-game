@@ -1,13 +1,14 @@
 class Board
 	canvas: null
 	context: null
-	bgContext: null
+	#bgContext: null
 	
 	width: 0
 	height: 0
 
 	gun: null
 	mirrors: null
+	obstacles: null
 	stars: null
 
 	shoted: false
@@ -15,19 +16,16 @@ class Board
 	constructor: (cv) ->
 		@canvas = document.getElementById(cv)
 		@context = @canvas.getContext "2d"
-		bcanvas = document.getElementById('bground')
-		@bgContext = bcanvas.getContext "2d"
+		#bcanvas = document.getElementById('bground')
+		#@bgContext = bcanvas.getContext "2d"
 		@width = @canvas.width
 		@height = @canvas.height
 
-		@context.fillStyle = 'white'
-		@context.strokeStyle = 'white'
-		@context.lineJoin = "round"
-		@bgContext.fillStyle = 'black'
-		@bgContext.fillRect 0, 0, @width, @height
+		drawer.setOptions @context, {color: '#000', join: 'round'}
 
 		@gun = new LaserGun {x: @width/2, y: @height/2}, 0
 		@mirrors = []
+		@obstacles = []
 		@stars = []
 
 	shot: (pos) ->
@@ -38,7 +36,7 @@ class Board
 		@shoted = true
 		@gun.angle = Math.atan2(dy, dx) * 180 / Math.PI
 		
-		# Debug only
+		# Debug reasons only
 		console.log @gun.angle, dy/dx
 		
 		@gun.laser.clear @gun.position, @gun.front()
@@ -51,13 +49,18 @@ class Board
 			star.glow = off for star in @stars
 			@gun.laser.clear @gun.position, @gun.front()
 
-			while @collided(@gun.laser.last()) != "wall"
+			a = @collided @gun.laser.last()
+			while !a #or !(a and a.type is "Wall")
+				#console.log a.type
 				@gun.laser.advance(1)
-				a = @collided(@gun.laser.last())
+				a = @collided @gun.laser.last() 
 				if a and a.type is "Mirror"
 					@reflect a
 				if a and a.type is "Star"
 					a.glow = on
+				# This way looks more elegant
+				if a and a.type is "Wall"
+					break
 		
 			@gun.laser.path[0] = @gun.front()
 		
@@ -73,26 +76,30 @@ class Board
 
 	collided: (pos) ->
 		if pos.x <= 0 or pos.x >= @width or pos.y <= 0 or pos.y >= @height
-			return "wall"
+			return {type: "Wall"}
+		return obstacle for obstacle in @obstacles when obstacle.collided(pos)
 		return mirror for mirror in @mirrors when mirror.collided(pos)
 		return star for star in @stars when star.collided(pos)
 		return null
 
 
-	addMirror: (pos, angle=0) ->
+	addMirror: (pos, angle=0, width=100) ->
 		@mirrors.push new PlaneMirror pos, angle
 
 	addStar: (pos, radius) ->
 		@stars.push new Star pos, radius
 
-
+	addWall: (pos, angle=0, width) ->
+		@obstacles.push new Wall pos, angle, width
 	draw: () ->
 		@canvas.width = @canvas.width
+		@context.fillRect 0, 0, @width, @height
 
 		mirror.draw @context for mirror in @mirrors
-		@gun.laser.draw @context
-		star.draw @context for star in @stars
+		obstacle.draw @context for obstacle in @obstacles
 		@gun.draw @context
+		star.draw @context for star in @stars
+		@gun.laser.draw @context
 
 
 	animate: () ->
@@ -130,7 +137,7 @@ window.onload = () ->
 	window.board.addMirror {x: 400, y: 600-70}, 180
 
 	window.board.addMirror {x: 700, y: 300}, 90
-	window.board.addMirror {x: 100, y: 300}, 270
+	window.board.addWall {x: 100, y: 300}, 270, 100
 
 	window.board.addStar {x: 200, y: 350}, 10
 
