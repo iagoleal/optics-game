@@ -12,7 +12,7 @@ class Drawer
 				when "join"
 					context.lineJoin = option
 				when "shadow"
-					for j, shadowOption of option
+					for j, shadowOption of option when option
 						switch j
 							when "blur"
 								context.shadowBlur = shadowOption
@@ -29,7 +29,7 @@ class Drawer
 
 		context.beginPath()
 		context.arc center.x, center.y, radius, start*@angleMod, end*@angleMod
-		
+		context.closePath()
 		if type is "stroke" then context.stroke() else context.fill()
 		
 		context.restore()

@@ -1,7 +1,6 @@
 class Board
 	canvas: null
 	context: null
-	#bgContext: null
 	
 	width: 0
 	height: 0
@@ -11,17 +10,20 @@ class Board
 	obstacles: null
 	stars: null
 
+
 	shoted: false
 
 	constructor: (cv) ->
 		@canvas = document.getElementById(cv)
 		@context = @canvas.getContext "2d"
-		#bcanvas = document.getElementById('bground')
-		#@bgContext = bcanvas.getContext "2d"
+
 		@width = @canvas.width
 		@height = @canvas.height
 
+
 		drawer.setOptions @context, {color: '#000', join: 'round'}
+		@context.translate(0, @height)
+		@context.scale(1, -1)
 
 		@gun = new LaserGun {x: @width/2, y: @height/2}, 0
 		@mirrors = []
@@ -44,6 +46,14 @@ class Board
 		#@gun.laser.path[0] = @gun.front()
 
 
+	collisionEffect: (a) ->
+		if a and a.type is "Mirror"
+			@reflect a
+		if a and a.type is "Star"
+			a.glow = on
+
+			@gun.laser.advance(a.radius*2)
+
 	recalculate: () ->
 		if @gun.laser.path.length >= 2
 			star.glow = off for star in @stars
@@ -53,11 +63,7 @@ class Board
 			while !a or !(a and a.type is "Wall")
 				#console.log a.type
 				@gun.laser.advance(1)
-				a = @collided @gun.laser.last() 
-				if a and a.type is "Mirror"
-					@reflect a
-				if a and a.type is "Star"
-					a.glow = on
+				@collisionEffect @collided @gun.laser.last() 
 
 			@gun.laser.path[0] = @gun.front()
 		
@@ -81,22 +87,30 @@ class Board
 
 
 	addMirror: (pos, angle=0, width=100) ->
-		@mirrors.push new PlaneMirror pos, angle
+		@mirrors.push new PlaneMirror pos, angle, width
 
 	addStar: (pos, radius) ->
 		@stars.push new Star pos, radius
 
 	addWall: (pos, angle=0, width) ->
 		@obstacles.push new Wall pos, angle, width
+
 	draw: () ->
-		@canvas.width = @canvas.width
+		#@canvas.width = @width
+		@context.save()
+
+		@context.setTransform(1, 0, 0, 1, 0, 0)
+		@context.clearRect 0, 0, @width, @height
+
+		@context.restore()
+		
 		@context.fillRect 0, 0, @width, @height
 
 		mirror.draw @context for mirror in @mirrors
 		obstacle.draw @context for obstacle in @obstacles
+		@gun.laser.draw @context
 		@gun.draw @context
 		star.draw @context for star in @stars
-		@gun.laser.draw @context
 
 
 	animate: () ->
@@ -104,16 +118,14 @@ class Board
 		coll = @collided(@gun.laser.last())
 		if ! coll and @shoted
 			i = 0
-			while ! @collided(@gun.laser.last()) and i < 10
+			while ! coll and i < 10
 				@gun.laser.advance(1)
 				i++
+				coll = @collided(@gun.laser.last())
+				@collisionEffect coll
 		else # if laser animation is finished, just do the laser maintenance
-			if coll and coll.type is "Mirror"
-				@reflect coll
-			else if coll and coll.type is "Star"
-				coll.glow = on
-				@gun.laser.advance(coll.radius*2)
-			
+			if coll
+				@collisionEffect coll
 			else
 				@shoted = false# if @collided(@gun.laser.last()) is "wall"
 				@recalculate()
@@ -123,17 +135,49 @@ class Board
 			@animate()
 		, 1000/1000
 
+class Interface
+	width: 0
+	height: 0
+
+	context: null
+
+	turner: null
+
+	constructor: (cv) ->
+		canvas = document.getElementById(cv)
+		@context = canvas.getContext "2d"
+
+		@context.translate(0, @height)
+		@context.scale(1, -1)
+
+		@width = canvas.width
+		@height = canvas.height
+
+	draw: () ->
+		@context.clearRect 0, 0, @width, @height
+
+		@context.fillStyle = "blue"
+		@context.strokeStyle = "blue"
+		#@context.beginPath()
+		#@context.moveTo 0, 0
+		#@context.rect 0, 0, @width-10, @height-100
+		#@context.closePath()
+		#@context.fill()
+
+		@turner.draw @context if @turner
+
 
 window.onload = () ->
 	window.board = new Board "board"
+	window.buttons = new Interface "buttons"
 	window.board.addMirror {x: 600, y: 70}, 45
 	window.board.addMirror {x: 200, y: 70}, 325
-	window.board.addMirror {x: 400, y: 70}, 0
+	window.board.addMirror {x: 400, y: 70}, 90
 	window.board.addMirror {x: 200, y: 600-70}, 225
 	window.board.addMirror {x: 600, y: 600-70}, 135
-	window.board.addMirror {x: 400, y: 600-70}, 180
+	window.board.addMirror {x: 400, y: 600-70}, 0
 
-	window.board.addMirror {x: 700, y: 300}, 90
+	window.board.addMirror {x: 700, y: 300}, 45
 	window.board.addWall {x: 100, y: 300}, 270, 100
 
 	window.board.addStar {x: 200, y: 350}, 10
@@ -144,20 +188,24 @@ window.onload = () ->
 	longPress = no
 
 	#Click Event
-	document.getElementById('board').addEventListener 'mousedown', (e) =>
+	document.addEventListener 'mousedown', (e) =>
 		pos = 
 			x: e.pageX - board.canvas.offsetLeft
-			y: e.pageY - board.canvas.offsetTop
+			y: board.height - e.pageY - board.canvas.offsetTop
 
 		clickTimer = setTimeout -> 
 			longPress = yes
-			console.log "BABU"
+
+			a = board.collided(pos)
+			console.log a
+			if a
+				buttons.turner = new Turner a
 		, 1000
-	document.getElementById('board').addEventListener 'mouseup', (e) =>
+	document.addEventListener 'mouseup', (e) =>
 		pos = 
 			x: e.pageX - board.canvas.offsetLeft
-			y: e.pageY - board.canvas.offsetTop
-
+			y: board.height - e.pageY - board.canvas.offsetTop
+		buttons.turner = null
 		clearTimeout clickTimer
 		board.shot(pos) unless longPress
 		longPress = no
@@ -172,7 +220,9 @@ mainLoop = () ->
 		document.getElementById("fps").innerHTML = fps.toFixed(2) + ' fps'
 		mainLoop.lastTime = new Date().getTime()
 
-	window.board.draw()
+	board.draw()
+	buttons.draw()
+
 	requestAnimationFrame(mainLoop)	
 
 window.requestAnimationFrame = do ->

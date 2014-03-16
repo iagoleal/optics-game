@@ -29,21 +29,23 @@
               _results1 = [];
               for (j in option) {
                 shadowOption = option[j];
-                switch (j) {
-                  case "blur":
-                    _results1.push(context.shadowBlur = shadowOption);
-                    break;
-                  case "color":
-                    _results1.push(context.shadowColor = shadowOption);
-                    break;
-                  case "offsetX":
-                    _results1.push(context.shadowOffsetX = shadowOption);
-                    break;
-                  case "offsetY":
-                    _results1.push(context.shadowOffsetY = shadowOption);
-                    break;
-                  default:
-                    _results1.push(void 0);
+                if (option) {
+                  switch (j) {
+                    case "blur":
+                      _results1.push(context.shadowBlur = shadowOption);
+                      break;
+                    case "color":
+                      _results1.push(context.shadowColor = shadowOption);
+                      break;
+                    case "offsetX":
+                      _results1.push(context.shadowOffsetX = shadowOption);
+                      break;
+                    case "offsetY":
+                      _results1.push(context.shadowOffsetY = shadowOption);
+                      break;
+                    default:
+                      _results1.push(void 0);
+                  }
                 }
               }
               return _results1;
@@ -64,6 +66,7 @@
       this.setOptions(context, options);
       context.beginPath();
       context.arc(center.x, center.y, radius, start * this.angleMod, end * this.angleMod);
+      context.closePath();
       if (type === "stroke") {
         context.stroke();
       } else {

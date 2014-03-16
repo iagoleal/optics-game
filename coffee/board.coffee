@@ -1,7 +1,7 @@
-dist2 = (p1, p2) ->
+window.dist2 = (p1, p2) ->
 	Math.abs((p1.x-p2.x))*Math.abs((p1.x-p2.x)) + Math.abs((p1.y-p2.y))*Math.abs((p1.y-p2.y))
 
-dist = (p1, p2) -> Math.sqrt(dist2(p1, p2))
+window.dist = (p1, p2) -> Math.sqrt(dist2(p1, p2))
 
 class Turnable
 	position: null
@@ -46,21 +46,23 @@ class Rectangle extends Turnable
 				@position.y + @height/2 >= ry
 
 	draw: (context) ->
-		drawer.rectangle context, "fill", @angle, @position, @width, @height, {color: 'white'}
+		drawer.rectangle context, "fill", @angle, @position, @width, @height, {color: '#aaa'}
 
 class Wall extends Rectangle
 	type: "Wall"
 
 class PlaneMirror extends Rectangle
 	type: "Mirror"
+	height: 4
+
 
 	reflect: (ang) -> 
-		mangle = @angle
+		mangle = if @angle <= 180 then @angle else (@angle-180)
 		mangle -= 90 if mangle in [0, 90, 180, 270]
 		return  360 - (ang + 2*mangle)
 
 	draw: (context) ->
-		drawer.rectangle context, "fill", @angle, @position, @width, @height, {color: 'black', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
+		drawer.rectangle context, "stroke", @angle, @position, @width, @height, {color: 'white', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
 		drawer.distance context, (45+@angle), @position, 100, {color: 'white'}
 
 class LaserGun extends Turnable
@@ -82,9 +84,14 @@ class LaserGun extends Turnable
 
 class Laser
 	path: null
+	color: null
 
 	constructor: (origin) ->
 		@path = []
+		@color = 
+			r: 255
+			g: 255
+			b: 255
 		@path.push(origin) if origin
 
 
@@ -127,7 +134,7 @@ class Laser
 		if @path.length > 1
 			for i in [5..0]
 				lineWidth = (i+1)*4-2
-				color = if i is 0 then '#fff' else "rgba(150, 230, 250, 0.2)"
+				color = if i is 0 then '#fff' else "rgba(#{@color.r}, #{@color.g}, #{@color.b}, 0.2)"
 				drawer.path context, @path, {color: color, width: lineWidth}
 class Star
 	radius: 10
@@ -145,7 +152,7 @@ class Star
 
 	draw: (context) ->
 		a = "stroke"
-		shadow = {}
+		shadow = {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}
 		if @glow is on
 			a = "fill"
 			shadow.color = '#aaeeff'

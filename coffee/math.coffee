@@ -3,8 +3,8 @@ dist2 = (p1, p2) ->
 
 dist = (p1, p2) -> Math.sqrt(dist2(p1, p2))
 
-class Collision
-	@rect: (point, rectPos, width, height, angle=0) ->
+Collision =
+	rect: (point, rectPos, width, height, angle=0) ->
 		#rotated rectangle collision
 		c = Math.cos(-angle*Math.PI/180)
 		s = Math.sin(-angle*Math.PI/180)
@@ -17,5 +17,5 @@ class Collision
 				rectPos.y - height/2 <= ry and 
 				rectPos.y + height/2 >= ry
 
-	@circle: (point, center, radius) ->
+	circle: (point, center, radius) ->
 		dist2(center, point) <= radius*radius
