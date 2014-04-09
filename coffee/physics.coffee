@@ -1,9 +1,9 @@
-dist2 = (p1, p2) ->
-	Math.abs((p1.x-p2.x))*Math.abs((p1.x-p2.x)) + Math.abs((p1.y-p2.y))*Math.abs((p1.y-p2.y))
+module 'Physics'
 
-dist = (p1, p2) -> Math.sqrt(dist2(p1, p2))
+Physics.Optics = 
+	reflec: () ->
 
-Collision =
+Physics.Collision =
 	rect: (point, rectPos, width, height, angle=0) ->
 		#rotated rectangle collision
 		c = Math.cos(-angle*Math.PI/180)

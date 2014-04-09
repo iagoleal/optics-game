@@ -7,17 +7,7 @@
 		
 		<link href="css/page.css" rel="stylesheet">
 
-		<script>
 
-			var module;
-
-			module = function(str) {
-				window[str] = window[str] || {};
-			};
-
-		</script>
-		<script src="js/physics.js"></script>
-		<script src="js/geometry.js"></script>
 		<script src="js/drawer.js"></script>
 		<script src="js/board.js"></script>
 		<script src="js/interface.js"></script>

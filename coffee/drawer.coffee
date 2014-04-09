@@ -48,6 +48,7 @@ class Drawer
 
 		context.restore()
 
+	#only for debugging
 	distance: (context, angle, start, distance, options={}) ->
 		context.save()
 
@@ -65,6 +66,7 @@ class Drawer
 
 		context.restore()
 
+	#WOOOW LOT OF PATH TRUTO
 	path: (context, points, options={}) ->
 		context.save()
 		
@@ -80,6 +82,7 @@ class Drawer
 
 		context.restore()
 
+	# im not obligated to explain that
 	rectangle: (context, type, angle, center, width, height, options={}) ->
 		context.save()
 
@@ -93,6 +96,7 @@ class Drawer
 
 		context.restore()
 
+	# neither that
 	polygon: (context, type, angle, center, sides, radius, options={}) ->
 		context.save()
 

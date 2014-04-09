@@ -22,8 +22,6 @@ class Board
 
 
 		drawer.setOptions @context, {color: '#000', join: 'round'}
-		@context.translate(0, @height)
-		@context.scale(1, -1)
 
 		@gun = new LaserGun {x: @width/2, y: @height/2}, 0
 		@mirrors = []
@@ -147,9 +145,6 @@ class Interface
 		canvas = document.getElementById(cv)
 		@context = canvas.getContext "2d"
 
-		@context.translate(0, @height)
-		@context.scale(1, -1)
-
 		@width = canvas.width
 		@height = canvas.height
 
@@ -191,7 +186,7 @@ window.onload = () ->
 	document.addEventListener 'mousedown', (e) =>
 		pos = 
 			x: e.pageX - board.canvas.offsetLeft
-			y: board.height - e.pageY - board.canvas.offsetTop
+			y: e.pageY - board.canvas.offsetTop
 
 		clickTimer = setTimeout -> 
 			longPress = yes
@@ -204,7 +199,7 @@ window.onload = () ->
 	document.addEventListener 'mouseup', (e) =>
 		pos = 
 			x: e.pageX - board.canvas.offsetLeft
-			y: board.height - e.pageY - board.canvas.offsetTop
+			y: e.pageY - board.canvas.offsetTop
 		buttons.turner = null
 		clearTimeout clickTimer
 		board.shot(pos) unless longPress

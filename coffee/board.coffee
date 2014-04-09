@@ -1,57 +1,7 @@
-window.dist2 = (p1, p2) ->
-	Math.abs((p1.x-p2.x))*Math.abs((p1.x-p2.x)) + Math.abs((p1.y-p2.y))*Math.abs((p1.y-p2.y))
-
-window.dist = (p1, p2) -> Math.sqrt(dist2(p1, p2))
-
-class Turnable
-	position: null
-	angle: 0
-
-	constructor: (pos={x:0, y:0},@angle=0) ->
-		@position =
-			x: pos.x
-			y: pos.y
-
-	turn: (dgr) -> 
-		@angle += dgr
-
-		if @angle > 360
-			@angle -= 360
-		else if @angle < 0
-			@angle += 360
-		return this
-
-	collided: (point) ->
-	draw: (context) ->
-
-class Rectangle extends Turnable
-	width: 100
-	height: 10
-
-	constructor: (pos={x:0, y:0}, @angle=0,  @width=100) ->
-		super pos, angle
-
-
-	collided: (point) ->
-		#rotated rectangle collision
-		c = Math.cos(-@angle*Math.PI/180)
-		s = Math.sin(-@angle*Math.PI/180)
-
-		rx = @position.x + c * (point.x - @position.x) - s * (point.y - @position.y)
-		ry = @position.y + s * (point.x - @position.x) + c * (point.y - @position.y)
-
-		return  @position.x - @width/2 <= rx and 
-				@position.x + @width/2 >= rx and 
-				@position.y - @height/2 <= ry and 
-				@position.y + @height/2 >= ry
-
-	draw: (context) ->
-		drawer.rectangle context, "fill", @angle, @position, @width, @height, {color: '#aaa'}
-
-class Wall extends Rectangle
+class Wall extends Geometry.Rectangle
 	type: "Wall"
 
-class PlaneMirror extends Rectangle
+class PlaneMirror extends Geometry.Rectangle
 	type: "Mirror"
 	height: 4
 
@@ -65,7 +15,7 @@ class PlaneMirror extends Rectangle
 		drawer.rectangle context, "stroke", @angle, @position, @width, @height, {color: 'white', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
 		drawer.distance context, (45+@angle), @position, 100, {color: 'white'}
 
-class LaserGun extends Turnable
+class LaserGun extends Geometry.Turnable
 	radius: 30
 	laser: null
 	img: null
@@ -148,7 +98,7 @@ class Star
 			y: pos.y
 
 	collided: (point) ->
-		dist2(@position, point) <= @radius*@radius
+		Geometry.dist2(@position, point) <= @radius*@radius
 
 	draw: (context) ->
 		a = "stroke"
