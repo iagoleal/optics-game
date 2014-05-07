@@ -3,7 +3,7 @@ module 'Geometry'
 Geometry.dist2 = (p1, p2) ->
 	Math.abs((p1.x-p2.x))*Math.abs((p1.x-p2.x)) + Math.abs((p1.y-p2.y))*Math.abs((p1.y-p2.y))
 
-Geometry.dist = (p1, p2) -> Math.sqrt(dist2(p1, p2))
+Geometry.distance = (p1, p2) -> Math.sqrt(Geometry.dist2(p1, p2))
 
 
 class Geometry.Turnable

@@ -35,6 +35,7 @@ class LaserGun extends Geometry.Turnable
 class Laser
 	path: null
 	color: null
+	velocity: null
 
 	constructor: (origin) ->
 		@path = []
@@ -42,11 +43,14 @@ class Laser
 			r: 255
 			g: 255
 			b: 255
+		@velocity = new Physics.Vector
+		@velocity.magnitude 1
 		@path.push(origin) if origin
 
 
 	addPoint: (p) ->
 		@path.push p
+		@velocity.angle @angle(p)
 
 	angle: (point=-1) ->
 		[dy, dx] = @changeRate(point)
@@ -71,9 +75,9 @@ class Laser
 		x: @path[@path.length-1].x
 		y: @path[@path.length-1].y
 
-	advance: (rate=1) ->
-		@path[@path.length-1].x += rate*Math.cos(@angle()*Math.PI/180)
-		@path[@path.length-1].y += rate*Math.sin(@angle()*Math.PI/180)
+	advance: () ->
+		@path[@path.length-1].x += @velocity.magnitude()*Math.cos(@angle()*Math.PI/180)
+		@path[@path.length-1].y += @velocity.magnitude()*Math.sin(@angle()*Math.PI/180)
 
 	clear: () ->
 		@path = []
