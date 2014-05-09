@@ -5,11 +5,18 @@ class PlaneMirror extends Geometry.Rectangle
 	type: "Mirror"
 	height: 4
 
+	reflect: (ang) ->
+		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)
+		mangle = @angle - Math.PI/2
+		console.log "a", mangle*180/Math.PI, ang*180/Math.PI
+		return 2*Math.PI - (ang - 2*mangle)
 
+	###
 	reflect: (ang) -> 
 		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)
 		mangle -= Math.PI/2 if mangle in [0, Math.PI/2, Math.PI, Math.PI*2/3]
 		return  2*Math.PI - (ang + 2*mangle)
+	###
 
 	draw: (context) ->
 		drawer.rectangle context, "stroke", @angle, @position, @width, @height, {color: 'white', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
@@ -39,7 +46,7 @@ class LaserGun extends Geometry.Turnable
 		@angle = Math.atan2(dy, dx) 
 
 		# Debug reasons only
-		console.log @angle, dy/dx
+		console.log @angle*180/Math.PI, dy/dx
 
 		#Shot laser
 		@laser.clear @position, @front()

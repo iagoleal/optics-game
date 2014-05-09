@@ -295,7 +295,7 @@
     window.board.addMirror({
       x: 400,
       y: 70
-    }, Geometry.rad(90));
+    }, Geometry.rad(0));
     window.board.addMirror({
       x: 200,
       y: 600 - 70

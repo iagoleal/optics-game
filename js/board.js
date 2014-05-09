@@ -33,11 +33,18 @@
     PlaneMirror.prototype.reflect = function(ang) {
       var mangle;
       mangle = this.angle <= Math.PI ? this.angle : this.angle - Math.PI;
-      if (mangle === 0 || mangle === (Math.PI / 2) || mangle === Math.PI || mangle === (Math.PI * 2 / 3)) {
-        mangle -= Math.PI / 2;
-      }
-      return 2 * Math.PI - (ang + 2 * mangle);
+      mangle = this.angle - Math.PI / 2;
+      console.log("a", mangle * 180 / Math.PI, ang * 180 / Math.PI);
+      return 2 * Math.PI - (ang - 2 * mangle);
     };
+
+    /*
+    	reflect: (ang) -> 
+    		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)
+    		mangle -= Math.PI/2 if mangle in [0, Math.PI/2, Math.PI, Math.PI*2/3]
+    		return  2*Math.PI - (ang + 2*mangle)
+    */
+
 
     PlaneMirror.prototype.draw = function(context) {
       drawer.rectangle(context, "stroke", this.angle, this.position, this.width, this.height, {
@@ -94,7 +101,7 @@
       dy = pos.y - this.position.y;
       dx = pos.x - this.position.x;
       this.angle = Math.atan2(dy, dx);
-      console.log(this.angle, dy / dx);
+      console.log(this.angle * 180 / Math.PI, dy / dx);
       this.laser.clear(this.position, this.front());
       return this.laser.advance(1);
     };

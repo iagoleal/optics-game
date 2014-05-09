@@ -180,7 +180,7 @@ window.onload = () ->
 	window.buttons = new Interface "buttons"
 	window.board.addMirror {x: 600, y: 70}, Math.PI/4
 	window.board.addMirror {x: 200, y: 70}, Geometry.rad(325)
-	window.board.addMirror {x: 400, y: 70}, Geometry.rad(90)
+	window.board.addMirror {x: 400, y: 70}, Geometry.rad(0)
 	window.board.addMirror {x: 200, y: 600-70}, Geometry.rad(225)
 	window.board.addMirror {x: 600, y: 600-70}, Geometry.rad(135)
 	window.board.addMirror {x: 400, y: 600-70}, Geometry.rad(180)
