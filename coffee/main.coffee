@@ -30,6 +30,9 @@ class Board
 		@stars = []
 
 		@guns.push new LaserGun {x: @width/2, y: @height/2}, 0
+		@guns.push new LaserGun {x: @width/3, y: @width/3}, 0
+		@guns.push new LaserGun {x: @width*2/3, y: @width*2/3}, 0
+
 
 	shot: (pos) ->
 
@@ -89,8 +92,12 @@ class Board
 		@obstacles.push new Wall pos, angle, width
 
 	selectGun: (pos) ->
+		r = false
 		for gun in @guns when gun.collided(pos)
+			r = true
 			@selectedGun = if @selectedGun is gun then null else gun
+		return r
+
 
 
 	draw: () ->
@@ -123,7 +130,7 @@ class Board
 			if ! coll and @shoted
 				i = 0
 				while ! coll and i < 10
-					gun.laser.advance(1)
+					gun.laser.advance()
 					i++
 					coll = @collided(gun.laser.last())
 					@collisionEffect coll, gun
@@ -210,8 +217,8 @@ window.onload = () ->
 		buttons.turner = null
 		clearTimeout clickTimer
 		unless longPress
-			board.shot(pos)
-			board.selectGun(pos)
+			unless board.selectGun(pos)
+				board.shot(pos)
 
 		longPress = no
 

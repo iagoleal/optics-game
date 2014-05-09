@@ -7,9 +7,9 @@ class PlaneMirror extends Geometry.Rectangle
 
 
 	reflect: (ang) -> 
-		mangle = if @angle <= 180 then @angle else (@angle-180)
-		mangle -= 90 if mangle in [0, 90, 180, 270]
-		return  360 - (ang + 2*mangle)
+		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)
+		mangle -= Math.PI/2 if mangle in [0, Math.PI/2, Math.PI, Math.PI*2/3]
+		return  2*Math.PI - (ang + 2*mangle)
 
 	draw: (context) ->
 		drawer.rectangle context, "stroke", @angle, @position, @width, @height, {color: 'white', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
@@ -21,8 +21,10 @@ class LaserGun extends Geometry.Turnable
 	img: null
 
 	constructor: (pos={x:0, y:0},@angle=0) ->
-		super pos, @angle
-		@laser = new Laser @position
+		@position =
+			x: pos.x
+			y: pos.y
+		@laser = new Laser
 
 	front: () ->
 		x: @position.x + @radius*Math.cos(@angle)
@@ -47,7 +49,10 @@ class LaserGun extends Geometry.Turnable
 		Physics.Collision.circle(p, @position, @radius)
 
 	draw: (context, selected) ->
-		drawer.polygon(context, "stroke", @angle, @position, 3, @radius, {width: 1, color:'white'})
+		color = '#ffffff'
+		if selected
+			color = '#ff0000'
+		drawer.polygon(context, "stroke", @angle, @position, 3, @radius, {width: 1, color: color})
 
 
 class Laser
@@ -55,7 +60,7 @@ class Laser
 	color: null
 	velocity: null
 
-	constructor: (origin) ->
+	constructor: (origin={x:0, y: 0}) ->
 		@path = []
 		@color = 
 			r: 255

@@ -32,11 +32,11 @@
 
     PlaneMirror.prototype.reflect = function(ang) {
       var mangle;
-      mangle = this.angle <= 180 ? this.angle : this.angle - 180;
-      if (mangle === 0 || mangle === 90 || mangle === 180 || mangle === 270) {
-        mangle -= 90;
+      mangle = this.angle <= Math.PI ? this.angle : this.angle - Math.PI;
+      if (mangle === 0 || mangle === (Math.PI / 2) || mangle === Math.PI || mangle === (Math.PI * 2 / 3)) {
+        mangle -= Math.PI / 2;
       }
-      return 360 - (ang + 2 * mangle);
+      return 2 * Math.PI - (ang + 2 * mangle);
     };
 
     PlaneMirror.prototype.draw = function(context) {
@@ -75,8 +75,11 @@
         };
       }
       this.angle = angle != null ? angle : 0;
-      LaserGun.__super__.constructor.call(this, pos, this.angle);
-      this.laser = new Laser(this.position);
+      this.position = {
+        x: pos.x,
+        y: pos.y
+      };
+      this.laser = new Laser;
     }
 
     LaserGun.prototype.front = function() {
@@ -101,9 +104,14 @@
     };
 
     LaserGun.prototype.draw = function(context, selected) {
+      var color;
+      color = '#ffffff';
+      if (selected) {
+        color = '#ff0000';
+      }
       return drawer.polygon(context, "stroke", this.angle, this.position, 3, this.radius, {
         width: 1,
-        color: 'white'
+        color: color
       });
     };
 
@@ -119,6 +127,12 @@
     Laser.prototype.velocity = null;
 
     function Laser(origin) {
+      if (origin == null) {
+        origin = {
+          x: 0,
+          y: 0
+        };
+      }
       this.path = [];
       this.color = {
         r: 255,

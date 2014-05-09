@@ -40,6 +40,14 @@
         x: this.width / 2,
         y: this.height / 2
       }, 0));
+      this.guns.push(new LaserGun({
+        x: this.width / 3,
+        y: this.width / 3
+      }, 0));
+      this.guns.push(new LaserGun({
+        x: this.width * 2 / 3,
+        y: this.width * 2 / 3
+      }, 0));
     }
 
     Board.prototype.shot = function(pos) {
@@ -153,16 +161,18 @@
     };
 
     Board.prototype.selectGun = function(pos) {
-      var gun, _i, _len, _ref, _results;
+      var gun, r, _i, _len, _ref;
+      r = false;
       _ref = this.guns;
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         gun = _ref[_i];
-        if (gun.collided(pos)) {
-          _results.push(this.selectedGun = this.selectedGun === gun ? null : gun);
+        if (!(gun.collided(pos))) {
+          continue;
         }
+        r = true;
+        this.selectedGun = this.selectedGun === gun ? null : gun;
       }
-      return _results;
+      return r;
     };
 
     Board.prototype.draw = function() {
@@ -211,7 +221,7 @@
         if (!coll && this.shoted) {
           i = 0;
           while (!coll && i < 10) {
-            gun.laser.advance(1);
+            gun.laser.advance();
             i++;
             coll = this.collided(gun.laser.last());
             this.collisionEffect(coll, gun);
@@ -338,8 +348,9 @@
       buttons.turner = null;
       clearTimeout(clickTimer);
       if (!longPress) {
-        board.shot(pos);
-        board.selectGun(pos);
+        if (!board.selectGun(pos)) {
+          board.shot(pos);
+        }
       }
       return longPress = false;
     });
