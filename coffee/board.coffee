@@ -8,15 +8,11 @@ class PlaneMirror extends Geometry.Rectangle
 	reflect: (ang) ->
 		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)
 		mangle = @angle - Math.PI/2
-		console.log "a", mangle*180/Math.PI, ang*180/Math.PI
-		return 2*Math.PI - (ang - 2*mangle)
 
-	###
-	reflect: (ang) -> 
-		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)
-		mangle -= Math.PI/2 if mangle in [0, Math.PI/2, Math.PI, Math.PI*2/3]
-		return  2*Math.PI - (ang + 2*mangle)
-	###
+		console.log "a", (2*Math.PI - ang + 2*mangle)*180/Math.PI
+
+		return Geometry.reduceAngle( 2*Math.PI - ang + 2*mangle )
+
 
 	draw: (context) ->
 		drawer.rectangle context, "stroke", @angle, @position, @width, @height, {color: 'white', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
@@ -125,6 +121,8 @@ class Star
 	position: null
 	glow: off
 	type: "Star"
+	stage: 0
+	stageMod: 1
 
 	constructor: (pos={x:0, y:0}, @radius=1) ->
 		@position =
@@ -135,6 +133,11 @@ class Star
 		Geometry.dist2(@position, point) <= @radius*@radius
 
 	draw: (context) ->
+		#Animation
+		if @stage > 50 or @stage < 0
+			@stageMod *= -1
+		@stage += @stageMod
+
 		a = "stroke"
 		shadow = {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}
 		if @glow is on
@@ -142,7 +145,7 @@ class Star
 			shadow.color = '#aaeeff'
 			shadow.offsetX = 0
 			shadow.offsetY = 0
-			shadow.blur = 25
+			shadow.blur = @stage/2
 			#drawer.arc context, a, @position, 0, 360, @radius*1.7, {color: 'rgba(250, 250, 250, 0.2'}
 		drawer.arc context, a, @position, 0, 360, @radius, {color: '#fff', shadow: shadow }
 

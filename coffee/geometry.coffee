@@ -8,6 +8,16 @@ Geometry.distance = (p1, p2) -> Math.sqrt(Geometry.dist2(p1, p2))
 Geometry.rad = (ang) ->
 	ang * Math.PI/180
 
+Geometry.reduceAngle = (ang) ->
+	if ang > 0
+		while ang >= 2*Math.PI
+			ang -= 2*Math.PI
+	else
+		while ang <= -2*Math.PI
+			ang += 2*Math.PI
+		ang = 2*Math.PI + ang 
+	return ang
+
 class Geometry.Turnable
 	position: null
 	angle: 0

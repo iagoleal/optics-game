@@ -44,10 +44,6 @@
         x: this.width / 3,
         y: this.width / 3
       }, 0));
-      this.guns.push(new LaserGun({
-        x: this.width * 2 / 3,
-        y: this.width * 2 / 3
-      }, 0));
     }
 
     Board.prototype.shot = function(pos) {
@@ -109,7 +105,7 @@
     };
 
     Board.prototype.collided = function(pos) {
-      var mirror, obstacle, star, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+      var gun, mirror, obstacle, star, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
       if (pos.x <= 0 || pos.x >= this.width || pos.y <= 0 || pos.y >= this.height) {
         return {
           type: "Wall"
@@ -134,6 +130,13 @@
         star = _ref2[_k];
         if (star.collided(pos)) {
           return star;
+        }
+      }
+      _ref3 = this.guns;
+      for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
+        gun = _ref3[_l];
+        if (gun.collided(pos)) {
+          return gun;
         }
       }
       return null;

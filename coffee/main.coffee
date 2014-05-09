@@ -31,7 +31,6 @@ class Board
 
 		@guns.push new LaserGun {x: @width/2, y: @height/2}, 0
 		@guns.push new LaserGun {x: @width/3, y: @width/3}, 0
-		@guns.push new LaserGun {x: @width*2/3, y: @width*2/3}, 0
 
 
 	shot: (pos) ->
@@ -79,6 +78,7 @@ class Board
 		return obstacle for obstacle in @obstacles when obstacle.collided(pos)
 		return mirror for mirror in @mirrors when mirror.collided(pos)
 		return star for star in @stars when star.collided(pos)
+		return gun for gun in @guns when gun.collided(pos)
 		return null
 
 

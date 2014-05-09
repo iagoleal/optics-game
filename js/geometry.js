@@ -17,6 +17,20 @@
     return ang * Math.PI / 180;
   };
 
+  Geometry.reduceAngle = function(ang) {
+    if (ang > 0) {
+      while (ang >= 2 * Math.PI) {
+        ang -= 2 * Math.PI;
+      }
+    } else {
+      while (ang <= -2 * Math.PI) {
+        ang += 2 * Math.PI;
+      }
+      ang = 2 * Math.PI + ang;
+    }
+    return ang;
+  };
+
   Geometry.Turnable = (function() {
     Turnable.prototype.position = null;
 

@@ -34,17 +34,9 @@
       var mangle;
       mangle = this.angle <= Math.PI ? this.angle : this.angle - Math.PI;
       mangle = this.angle - Math.PI / 2;
-      console.log("a", mangle * 180 / Math.PI, ang * 180 / Math.PI);
-      return 2 * Math.PI - (ang - 2 * mangle);
+      console.log("a", (2 * Math.PI - ang + 2 * mangle) * 180 / Math.PI);
+      return Geometry.reduceAngle(2 * Math.PI - ang + 2 * mangle);
     };
-
-    /*
-    	reflect: (ang) -> 
-    		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)
-    		mangle -= Math.PI/2 if mangle in [0, Math.PI/2, Math.PI, Math.PI*2/3]
-    		return  2*Math.PI - (ang + 2*mangle)
-    */
-
 
     PlaneMirror.prototype.draw = function(context) {
       drawer.rectangle(context, "stroke", this.angle, this.position, this.width, this.height, {
@@ -242,6 +234,10 @@
 
     Star.prototype.type = "Star";
 
+    Star.prototype.stage = 0;
+
+    Star.prototype.stageMod = 1;
+
     function Star(pos, radius) {
       if (pos == null) {
         pos = {
@@ -262,6 +258,10 @@
 
     Star.prototype.draw = function(context) {
       var a, shadow;
+      if (this.stage > 50 || this.stage < 0) {
+        this.stageMod *= -1;
+      }
+      this.stage += this.stageMod;
       a = "stroke";
       shadow = {
         color: '#fff',
@@ -274,7 +274,7 @@
         shadow.color = '#aaeeff';
         shadow.offsetX = 0;
         shadow.offsetY = 0;
-        shadow.blur = 25;
+        shadow.blur = this.stage / 2;
       }
       return drawer.arc(context, a, this.position, 0, 360, this.radius, {
         color: '#fff',
