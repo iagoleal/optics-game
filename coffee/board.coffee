@@ -13,7 +13,7 @@ class PlaneMirror extends Geometry.Rectangle
 
 	draw: (context) ->
 		drawer.rectangle context, "stroke", @angle, @position, @width, @height, {color: 'white', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
-		drawer.distance context, (45+@angle), @position, 100, {color: 'white'}
+		drawer.distance context, (@angle), @position, 100, {color: 'white'}
 
 class LaserGun extends Geometry.Turnable
 	radius: 30
@@ -25,10 +25,28 @@ class LaserGun extends Geometry.Turnable
 		@laser = new Laser @position
 
 	front: () ->
-		x: @position.x + @radius*Math.cos(@angle*Math.PI/180)
-		y: @position.y + @radius*Math.sin(@angle*Math.PI/180)
+		x: @position.x + @radius*Math.cos(@angle)
+		y: @position.y + @radius*Math.sin(@angle)
 
-	draw: (context) ->
+	shot: (pos) ->
+		#Set slope of first line
+		dy = pos.y - @position.y
+		dx = pos.x - @position.x
+
+		# Get angle from slope
+		@angle = Math.atan2(dy, dx) 
+
+		# Debug reasons only
+		console.log @angle, dy/dx
+
+		#Shot laser
+		@laser.clear @position, @front()
+		@laser.advance(1)
+
+	collided: (p) ->
+		Physics.Collision.circle(p, @position, @radius)
+
+	draw: (context, selected) ->
 		drawer.polygon(context, "stroke", @angle, @position, 3, @radius, {width: 1, color:'white'})
 
 
@@ -55,7 +73,7 @@ class Laser
 	angle: (point=-1) ->
 		[dy, dx] = @changeRate(point)
 
-		return Math.atan2(dy, dx) *180/Math.PI
+		return Math.atan2(dy, dx)
 
 	changeRate: (point=-1) ->
 		point = @path.length + point if point < 0
@@ -76,8 +94,8 @@ class Laser
 		y: @path[@path.length-1].y
 
 	advance: () ->
-		@path[@path.length-1].x += @velocity.magnitude()*Math.cos(@angle()*Math.PI/180)
-		@path[@path.length-1].y += @velocity.magnitude()*Math.sin(@angle()*Math.PI/180)
+		@path[@path.length-1].x += @velocity.magnitude()*Math.cos(@angle())
+		@path[@path.length-1].y += @velocity.magnitude()*Math.sin(@angle())
 
 	clear: () ->
 		@path = []

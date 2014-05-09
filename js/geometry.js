@@ -13,6 +13,10 @@
     return Math.sqrt(Geometry.dist2(p1, p2));
   };
 
+  Geometry.rad = function(ang) {
+    return ang * Math.PI / 180;
+  };
+
   Geometry.Turnable = (function() {
     Turnable.prototype.position = null;
 
@@ -34,10 +38,10 @@
 
     Turnable.prototype.turn = function(dgr) {
       this.angle += dgr;
-      if (this.angle > 360) {
-        this.angle -= 360;
+      if (this.angle > 2 * Math.PI) {
+        this.angle -= 2 * Math.PI;
       } else if (this.angle < 0) {
-        this.angle += 360;
+        this.angle += 2 * Math.PI;
       }
       return this;
     };

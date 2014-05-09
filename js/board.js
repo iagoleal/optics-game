@@ -49,7 +49,7 @@
           blur: 10
         }
       });
-      return drawer.distance(context, 45 + this.angle, this.position, 100, {
+      return drawer.distance(context, this.angle, this.position, 100, {
         color: 'white'
       });
     };
@@ -81,12 +81,26 @@
 
     LaserGun.prototype.front = function() {
       return {
-        x: this.position.x + this.radius * Math.cos(this.angle * Math.PI / 180),
-        y: this.position.y + this.radius * Math.sin(this.angle * Math.PI / 180)
+        x: this.position.x + this.radius * Math.cos(this.angle),
+        y: this.position.y + this.radius * Math.sin(this.angle)
       };
     };
 
-    LaserGun.prototype.draw = function(context) {
+    LaserGun.prototype.shot = function(pos) {
+      var dx, dy;
+      dy = pos.y - this.position.y;
+      dx = pos.x - this.position.x;
+      this.angle = Math.atan2(dy, dx);
+      console.log(this.angle, dy / dx);
+      this.laser.clear(this.position, this.front());
+      return this.laser.advance(1);
+    };
+
+    LaserGun.prototype.collided = function(p) {
+      return Physics.Collision.circle(p, this.position, this.radius);
+    };
+
+    LaserGun.prototype.draw = function(context, selected) {
       return drawer.polygon(context, "stroke", this.angle, this.position, 3, this.radius, {
         width: 1,
         color: 'white'
@@ -129,7 +143,7 @@
         point = -1;
       }
       _ref2 = this.changeRate(point), dy = _ref2[0], dx = _ref2[1];
-      return Math.atan2(dy, dx) * 180 / Math.PI;
+      return Math.atan2(dy, dx);
     };
 
     Laser.prototype.changeRate = function(point) {
@@ -163,8 +177,8 @@
     };
 
     Laser.prototype.advance = function() {
-      this.path[this.path.length - 1].x += this.velocity.magnitude() * Math.cos(this.angle() * Math.PI / 180);
-      return this.path[this.path.length - 1].y += this.velocity.magnitude() * Math.sin(this.angle() * Math.PI / 180);
+      this.path[this.path.length - 1].x += this.velocity.magnitude() * Math.cos(this.angle());
+      return this.path[this.path.length - 1].y += this.velocity.magnitude() * Math.sin(this.angle());
     };
 
     Laser.prototype.clear = function() {

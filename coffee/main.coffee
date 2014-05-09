@@ -5,11 +5,12 @@ class Board
 	width: 0
 	height: 0
 
-	gun: null
+	guns: null
 	mirrors: null
 	obstacles: null
 	stars: null
 
+	selectedGun: null
 
 	shoted: false
 
@@ -23,56 +24,50 @@ class Board
 
 		drawer.setOptions @context, {color: '#000', join: 'round'}
 
-		@gun = new LaserGun {x: @width/2, y: @height/2}, 0
+		@guns = []
 		@mirrors = []
 		@obstacles = []
 		@stars = []
 
+		@guns.push new LaserGun {x: @width/2, y: @height/2}, 0
+
 	shot: (pos) ->
-		dx = pos.x - @gun.position.x
-		dy = pos.y - @gun.position.y
 
-		star.glow = off for star in @stars
-		@shoted = true
-		@gun.angle = Math.atan2(dy, dx) * 180 / Math.PI
-		
-		# Debug reasons only
-		console.log @gun.angle, dy/dx
-		
-		@gun.laser.clear @gun.position, @gun.front()
-		@gun.laser.advance(1)
-		#@gun.laser.path[0] = @gun.front()
+		if @selectedGun
+			star.glow = off for star in @stars
+			@shoted = true
+			@selectedGun.shot(pos)
 
 
-	collisionEffect: (a) ->
+	collisionEffect: (a, gun) ->
 		if a and a.type is "Mirror"
-			@reflect a
+			@reflect a, gun
 		if a and a.type is "Star"
 			a.glow = on
-
-			@gun.laser.advance(a.radius*2)
+			gun.laser.advance()
 
 	recalculate: () ->
-		if @gun.laser.path.length >= 2
-			star.glow = off for star in @stars
-			@gun.laser.clear @gun.position, @gun.front()
+		for gun in @guns
+			if gun.laser.path.length >= 2
+				star.glow = off for star in @stars
+				gun.laser.clear gun.position, gun.front()
 
-			a = @collided @gun.laser.last()
-			while !a or !(a and a.type is "Wall")
-				#console.log a.type
-				@gun.laser.advance(1)
-				@collisionEffect @collided @gun.laser.last() 
+				a = @collided gun.laser.last()
+				while !a or !(a and a.type is "Wall")
+					#console.log a.type
+					gun.laser.advance(1)
+					@collisionEffect @collided gun.laser.last(), gun
 
-			@gun.laser.path[0] = @gun.front()
+				gun.laser.path[0] = gun.front()
 		
-	reflect: (mirror) ->
-		angle = mirror.reflect @gun.laser.angle()
+	reflect: (mirror, gun) ->
+		angle = mirror.reflect gun.laser.angle()
 
-		pos = @gun.laser.last()
+		pos = gun.laser.last()
 		#slope = Math.abs(Math.tan(angle*Math.PI/180))
-		pos.x -= 20*Math.cos(angle*Math.PI/180)
-		pos.y -= 20*Math.sin(angle*Math.PI/180)
-		@gun.laser.addPoint pos
+		pos.x -= 20*Math.cos(angle)
+		pos.y -= 20*Math.sin(angle)
+		gun.laser.addPoint pos
 
 
 	collided: (pos) ->
@@ -93,6 +88,11 @@ class Board
 	addWall: (pos, angle=0, width) ->
 		@obstacles.push new Wall pos, angle, width
 
+	selectGun: (pos) ->
+		for gun in @guns when gun.collided(pos)
+			@selectedGun = if @selectedGun is gun then null else gun
+
+
 	draw: () ->
 		#@canvas.width = @width
 		@context.save()
@@ -106,27 +106,33 @@ class Board
 
 		mirror.draw @context for mirror in @mirrors
 		obstacle.draw @context for obstacle in @obstacles
-		@gun.laser.draw @context
-		@gun.draw @context
+		for gun in @guns
+			gun.laser.draw @context
+			if @selectedGun is gun
+				gun.draw @context, true
+			else
+				gun.draw @context
+
 		star.draw @context for star in @stars
 
 
 	animate: () ->
 		# Every time function is executed, the laser advances a little bit
-		coll = @collided(@gun.laser.last())
-		if ! coll and @shoted
-			i = 0
-			while ! coll and i < 10
-				@gun.laser.advance(1)
-				i++
-				coll = @collided(@gun.laser.last())
-				@collisionEffect coll
-		else # if laser animation is finished, just do the laser maintenance
-			if coll
-				@collisionEffect coll
-			else
-				@shoted = false# if @collided(@gun.laser.last()) is "wall"
-				@recalculate()
+		for gun in @guns
+			coll = @collided(gun.laser.last())
+			if ! coll and @shoted
+				i = 0
+				while ! coll and i < 10
+					gun.laser.advance(1)
+					i++
+					coll = @collided(gun.laser.last())
+					@collisionEffect coll, gun
+			else # if laser animation is finished, just do the laser maintenance
+				if coll
+					@collisionEffect coll, gun
+				else
+					@shoted = false# if @collided(@gun.laser.last()) is "wall"
+					@recalculate()
 		for m in @mirrors
 			m.turn 0
 		setTimeout => 
@@ -165,15 +171,15 @@ class Interface
 window.onload = () ->
 	window.board = new Board "board"
 	window.buttons = new Interface "buttons"
-	window.board.addMirror {x: 600, y: 70}, 45
-	window.board.addMirror {x: 200, y: 70}, 325
-	window.board.addMirror {x: 400, y: 70}, 90
-	window.board.addMirror {x: 200, y: 600-70}, 225
-	window.board.addMirror {x: 600, y: 600-70}, 135
-	window.board.addMirror {x: 400, y: 600-70}, 0
+	window.board.addMirror {x: 600, y: 70}, Math.PI/4
+	window.board.addMirror {x: 200, y: 70}, Geometry.rad(325)
+	window.board.addMirror {x: 400, y: 70}, Geometry.rad(90)
+	window.board.addMirror {x: 200, y: 600-70}, Geometry.rad(225)
+	window.board.addMirror {x: 600, y: 600-70}, Geometry.rad(135)
+	window.board.addMirror {x: 400, y: 600-70}, Geometry.rad(180)
 
-	window.board.addMirror {x: 700, y: 300}, 45
-	window.board.addWall {x: 100, y: 300}, 270, 100
+	window.board.addMirror {x: 700, y: 300}, Geometry.rad(45)
+	window.board.addWall {x: 100, y: 300}, Geometry.rad(270), 100
 
 	window.board.addStar {x: 200, y: 350}, 10
 
@@ -196,13 +202,17 @@ window.onload = () ->
 			if a
 				buttons.turner = new Turner a
 		, 1000
+
 	document.addEventListener 'mouseup', (e) =>
 		pos = 
 			x: e.pageX - board.canvas.offsetLeft
 			y: e.pageY - board.canvas.offsetTop
 		buttons.turner = null
 		clearTimeout clickTimer
-		board.shot(pos) unless longPress
+		unless longPress
+			board.shot(pos)
+			board.selectGun(pos)
+
 		longPress = no
 
 	requestAnimationFrame(mainLoop)	

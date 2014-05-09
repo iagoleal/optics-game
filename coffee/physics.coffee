@@ -10,16 +10,16 @@ class Physics.Vector
 		d = Geometry.distance({x: 0, y:0}, {x: @x, y: @y})
 		if n
 			d = n
-			@x = d * Math.cos(@angle()*Math.PI/180)
-			@y = d * Math.sin(@angle()*Math.PI/180)
+			@x = d * Math.cos(@angle())
+			@y = d * Math.sin(@angle())
 		return d
 
 	angle: (t) ->
-		a = Math.atan2(@y, @x)*180/Math.PI
+		a = Math.atan2(@y, @x)
 		if t
 			a = t
-			@x = @magnitude * Math.cos(a*Math.PI/180)
-			@y = @magnitude * Math.sin(a*Math.PI/180)
+			@x = @magnitude * Math.cos(a)
+			@y = @magnitude * Math.sin(a)
 		return a
 
 
@@ -30,8 +30,8 @@ Physics.Optics =
 Physics.Collision =
 	rect: (point, rectPos, width, height, angle=0) ->
 		#rotated rectangle collision
-		c = Math.cos(-angle*Math.PI/180)
-		s = Math.sin(-angle*Math.PI/180)
+		c = Math.cos(-angle)
+		s = Math.sin(-angle)
 
 		rx = rectPos.x + c * (point.x - rectPos.x) - s * (point.y - rectPos.y)
 		ry = rectPos.y + s * (point.x - rectPos.x) + c * (point.y - rectPos.y)
@@ -42,4 +42,4 @@ Physics.Collision =
 				rectPos.y + height/2 >= ry
 
 	circle: (point, center, radius) ->
-		dist2(center, point) <= radius*radius
+		Geometry.dist2(center, point) <= radius*radius

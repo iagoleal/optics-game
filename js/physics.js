@@ -23,19 +23,19 @@
       });
       if (n) {
         d = n;
-        this.x = d * Math.cos(this.angle() * Math.PI / 180);
-        this.y = d * Math.sin(this.angle() * Math.PI / 180);
+        this.x = d * Math.cos(this.angle());
+        this.y = d * Math.sin(this.angle());
       }
       return d;
     };
 
     Vector.prototype.angle = function(t) {
       var a;
-      a = Math.atan2(this.y, this.x) * 180 / Math.PI;
+      a = Math.atan2(this.y, this.x);
       if (t) {
         a = t;
-        this.x = this.magnitude * Math.cos(a * Math.PI / 180);
-        this.y = this.magnitude * Math.sin(a * Math.PI / 180);
+        this.x = this.magnitude * Math.cos(a);
+        this.y = this.magnitude * Math.sin(a);
       }
       return a;
     };
@@ -54,14 +54,14 @@
       if (angle == null) {
         angle = 0;
       }
-      c = Math.cos(-angle * Math.PI / 180);
-      s = Math.sin(-angle * Math.PI / 180);
+      c = Math.cos(-angle);
+      s = Math.sin(-angle);
       rx = rectPos.x + c * (point.x - rectPos.x) - s * (point.y - rectPos.y);
       ry = rectPos.y + s * (point.x - rectPos.x) + c * (point.y - rectPos.y);
       return rectPos.x - width / 2 <= rx && rectPos.x + width / 2 >= rx && rectPos.y - height / 2 <= ry && rectPos.y + height / 2 >= ry;
     },
     circle: function(point, center, radius) {
-      return dist2(center, point) <= radius * radius;
+      return Geometry.dist2(center, point) <= radius * radius;
     }
   };
 

@@ -5,7 +5,7 @@
   Drawer = (function() {
     function Drawer() {}
 
-    Drawer.prototype.angleMod = Math.PI / 180;
+    Drawer.prototype.angleMod = 1;
 
     Drawer.prototype.setOptions = function(context, options) {
       var index, j, option, shadowOption, _results;
@@ -99,7 +99,7 @@
       context.rotate(angle * this.angleMod);
       context.beginPath();
       context.moveTo(0, 0);
-      context.lineTo(distance, distance);
+      context.lineTo(0, distance);
       context.closePath();
       context.stroke();
       return context.restore();

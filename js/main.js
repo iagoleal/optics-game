@@ -11,13 +11,15 @@
 
     Board.prototype.height = 0;
 
-    Board.prototype.gun = null;
+    Board.prototype.guns = null;
 
     Board.prototype.mirrors = null;
 
     Board.prototype.obstacles = null;
 
     Board.prototype.stars = null;
+
+    Board.prototype.selectedGun = null;
 
     Board.prototype.shoted = false;
 
@@ -30,66 +32,72 @@
         color: '#000',
         join: 'round'
       });
-      this.gun = new LaserGun({
-        x: this.width / 2,
-        y: this.height / 2
-      }, 0);
+      this.guns = [];
       this.mirrors = [];
       this.obstacles = [];
       this.stars = [];
+      this.guns.push(new LaserGun({
+        x: this.width / 2,
+        y: this.height / 2
+      }, 0));
     }
 
     Board.prototype.shot = function(pos) {
-      var dx, dy, star, _i, _len, _ref;
-      dx = pos.x - this.gun.position.x;
-      dy = pos.y - this.gun.position.y;
-      _ref = this.stars;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        star = _ref[_i];
-        star.glow = false;
-      }
-      this.shoted = true;
-      this.gun.angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      console.log(this.gun.angle, dy / dx);
-      this.gun.laser.clear(this.gun.position, this.gun.front());
-      return this.gun.laser.advance(1);
-    };
-
-    Board.prototype.collisionEffect = function(a) {
-      if (a && a.type === "Mirror") {
-        this.reflect(a);
-      }
-      if (a && a.type === "Star") {
-        a.glow = true;
-        return this.gun.laser.advance(a.radius * 2);
-      }
-    };
-
-    Board.prototype.recalculate = function() {
-      var a, star, _i, _len, _ref;
-      if (this.gun.laser.path.length >= 2) {
+      var star, _i, _len, _ref;
+      if (this.selectedGun) {
         _ref = this.stars;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           star = _ref[_i];
           star.glow = false;
         }
-        this.gun.laser.clear(this.gun.position, this.gun.front());
-        a = this.collided(this.gun.laser.last());
-        while (!a || !(a && a.type === "Wall")) {
-          this.gun.laser.advance(1);
-          this.collisionEffect(this.collided(this.gun.laser.last()));
-        }
-        return this.gun.laser.path[0] = this.gun.front();
+        this.shoted = true;
+        return this.selectedGun.shot(pos);
       }
     };
 
-    Board.prototype.reflect = function(mirror) {
+    Board.prototype.collisionEffect = function(a, gun) {
+      if (a && a.type === "Mirror") {
+        this.reflect(a, gun);
+      }
+      if (a && a.type === "Star") {
+        a.glow = true;
+        return gun.laser.advance();
+      }
+    };
+
+    Board.prototype.recalculate = function() {
+      var a, gun, star, _i, _j, _len, _len1, _ref, _ref1, _results;
+      _ref = this.guns;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        gun = _ref[_i];
+        if (gun.laser.path.length >= 2) {
+          _ref1 = this.stars;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            star = _ref1[_j];
+            star.glow = false;
+          }
+          gun.laser.clear(gun.position, gun.front());
+          a = this.collided(gun.laser.last());
+          while (!a || !(a && a.type === "Wall")) {
+            gun.laser.advance(1);
+            this.collisionEffect(this.collided(gun.laser.last(), gun));
+          }
+          _results.push(gun.laser.path[0] = gun.front());
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+
+    Board.prototype.reflect = function(mirror, gun) {
       var angle, pos;
-      angle = mirror.reflect(this.gun.laser.angle());
-      pos = this.gun.laser.last();
-      pos.x -= 20 * Math.cos(angle * Math.PI / 180);
-      pos.y -= 20 * Math.sin(angle * Math.PI / 180);
-      return this.gun.laser.addPoint(pos);
+      angle = mirror.reflect(gun.laser.angle());
+      pos = gun.laser.last();
+      pos.x -= 20 * Math.cos(angle);
+      pos.y -= 20 * Math.sin(angle);
+      return gun.laser.addPoint(pos);
     };
 
     Board.prototype.collided = function(pos) {
@@ -144,8 +152,21 @@
       return this.obstacles.push(new Wall(pos, angle, width));
     };
 
+    Board.prototype.selectGun = function(pos) {
+      var gun, _i, _len, _ref, _results;
+      _ref = this.guns;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        gun = _ref[_i];
+        if (gun.collided(pos)) {
+          _results.push(this.selectedGun = this.selectedGun === gun ? null : gun);
+        }
+      }
+      return _results;
+    };
+
     Board.prototype.draw = function() {
-      var mirror, obstacle, star, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _results;
+      var gun, mirror, obstacle, star, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _results;
       this.context.save();
       this.context.setTransform(1, 0, 0, 1, 0, 0);
       this.context.clearRect(0, 0, this.width, this.height);
@@ -161,40 +182,52 @@
         obstacle = _ref1[_j];
         obstacle.draw(this.context);
       }
-      this.gun.laser.draw(this.context);
-      this.gun.draw(this.context);
-      _ref2 = this.stars;
-      _results = [];
+      _ref2 = this.guns;
       for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-        star = _ref2[_k];
+        gun = _ref2[_k];
+        gun.laser.draw(this.context);
+        if (this.selectedGun === gun) {
+          gun.draw(this.context, true);
+        } else {
+          gun.draw(this.context);
+        }
+      }
+      _ref3 = this.stars;
+      _results = [];
+      for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
+        star = _ref3[_l];
         _results.push(star.draw(this.context));
       }
       return _results;
     };
 
     Board.prototype.animate = function() {
-      var coll, i, m, _i, _len, _ref,
+      var coll, gun, i, m, _i, _j, _len, _len1, _ref, _ref1,
         _this = this;
-      coll = this.collided(this.gun.laser.last());
-      if (!coll && this.shoted) {
-        i = 0;
-        while (!coll && i < 10) {
-          this.gun.laser.advance(1);
-          i++;
-          coll = this.collided(this.gun.laser.last());
-          this.collisionEffect(coll);
-        }
-      } else {
-        if (coll) {
-          this.collisionEffect(coll);
+      _ref = this.guns;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        gun = _ref[_i];
+        coll = this.collided(gun.laser.last());
+        if (!coll && this.shoted) {
+          i = 0;
+          while (!coll && i < 10) {
+            gun.laser.advance(1);
+            i++;
+            coll = this.collided(gun.laser.last());
+            this.collisionEffect(coll, gun);
+          }
         } else {
-          this.shoted = false;
-          this.recalculate();
+          if (coll) {
+            this.collisionEffect(coll, gun);
+          } else {
+            this.shoted = false;
+            this.recalculate();
+          }
         }
       }
-      _ref = this.mirrors;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        m = _ref[_i];
+      _ref1 = this.mirrors;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        m = _ref1[_j];
         m.turn(0);
       }
       return setTimeout(function() {
@@ -244,35 +277,35 @@
     window.board.addMirror({
       x: 600,
       y: 70
-    }, 45);
+    }, Math.PI / 4);
     window.board.addMirror({
       x: 200,
       y: 70
-    }, 325);
+    }, Geometry.rad(325));
     window.board.addMirror({
       x: 400,
       y: 70
-    }, 90);
+    }, Geometry.rad(90));
     window.board.addMirror({
       x: 200,
       y: 600 - 70
-    }, 225);
+    }, Geometry.rad(225));
     window.board.addMirror({
       x: 600,
       y: 600 - 70
-    }, 135);
+    }, Geometry.rad(135));
     window.board.addMirror({
       x: 400,
       y: 600 - 70
-    }, 0);
+    }, Geometry.rad(180));
     window.board.addMirror({
       x: 700,
       y: 300
-    }, 45);
+    }, Geometry.rad(45));
     window.board.addWall({
       x: 100,
       y: 300
-    }, 270, 100);
+    }, Geometry.rad(270), 100);
     window.board.addStar({
       x: 200,
       y: 350
@@ -306,6 +339,7 @@
       clearTimeout(clickTimer);
       if (!longPress) {
         board.shot(pos);
+        board.selectGun(pos);
       }
       return longPress = false;
     });

@@ -1,5 +1,5 @@
 class Drawer
-	angleMod: Math.PI/180
+	angleMod: 1
 
 	setOptions: (context, options) ->
 		for index, option of options
@@ -59,7 +59,7 @@ class Drawer
 
 		context.beginPath()
 		context.moveTo 0, 0
-		context.lineTo distance, distance
+		context.lineTo 0, distance
 		context.closePath()
 		context.stroke()
 		

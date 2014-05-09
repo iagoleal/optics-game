@@ -5,6 +5,8 @@ Geometry.dist2 = (p1, p2) ->
 
 Geometry.distance = (p1, p2) -> Math.sqrt(Geometry.dist2(p1, p2))
 
+Geometry.rad = (ang) ->
+	ang * Math.PI/180
 
 class Geometry.Turnable
 	position: null
@@ -18,10 +20,10 @@ class Geometry.Turnable
 	turn: (dgr) -> 
 		@angle += dgr
 
-		if @angle > 360
-			@angle -= 360
+		if @angle > 2*Math.PI
+			@angle -= 2*Math.PI
 		else if @angle < 0
-			@angle += 360
+			@angle += 2*Math.PI
 		return this
 
 	collided: (point) ->
