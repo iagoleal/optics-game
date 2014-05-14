@@ -21,6 +21,7 @@ Geometry.reduceAngle = (ang) ->
 class Geometry.Turnable
 	position: null
 	angle: 0
+	turnable: on #Says if you can turn the object or not
 
 	constructor: (pos={x:0, y:0},@angle=0) ->
 		@position =

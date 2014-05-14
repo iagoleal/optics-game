@@ -66,7 +66,6 @@
       this.setOptions(context, options);
       context.beginPath();
       context.arc(center.x, center.y, radius, start * this.angleMod, end * this.angleMod);
-      context.closePath();
       if (type === "stroke") {
         context.stroke();
       } else {

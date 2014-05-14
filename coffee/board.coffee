@@ -1,155 +1,138 @@
-class Wall extends Geometry.Rectangle
-	type: "Wall"
+class Board
+	canvas: null
+	context: null
+	
+	width: 0
+	height: 0
 
-class PlaneMirror extends Geometry.Rectangle
-	type: "Mirror"
-	height: 4
+	guns: null
+	mirrors: null
+	obstacles: null
+	stars: null
 
-	reflect: (ang) ->
-		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)
-		mangle = @angle - Math.PI/2
+	selectedGun: null
 
-		console.log "a", (2*Math.PI - ang + 2*mangle)*180/Math.PI
+	shoted: false
 
-		return Geometry.reduceAngle( 2*Math.PI - ang + 2*mangle )
+	constructor: (cv) ->
+		@canvas = document.getElementById(cv)
+		@context = @canvas.getContext "2d"
+
+		@width = @canvas.width
+		@height = @canvas.height
 
 
-	draw: (context) ->
-		drawer.rectangle context, "stroke", @angle, @position, @width, @height, {color: 'white', shadow: {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}}
-		drawer.distance context, (@angle), @position, 100, {color: 'white'}
+		drawer.setOptions @context, {color: '#000', join: 'round'}
 
-class LaserGun extends Geometry.Turnable
-	radius: 30
-	laser: null
-	img: null
+		@guns = []
+		@mirrors = []
+		@obstacles = []
+		@stars = []
 
-	constructor: (pos={x:0, y:0},@angle=0) ->
-		@position =
-			x: pos.x
-			y: pos.y
-		@laser = new Laser
+		@guns.push new LaserGun {x: @width/2, y: @height/2}, 0
+		@guns.push new LaserGun {x: @width/3, y: @width/3}, 0
 
-	front: () ->
-		x: @position.x + @radius*Math.cos(@angle)
-		y: @position.y + @radius*Math.sin(@angle)
 
 	shot: (pos) ->
-		#Set slope of first line
-		dy = pos.y - @position.y
-		dx = pos.x - @position.x
-
-		# Get angle from slope
-		@angle = Math.atan2(dy, dx) 
-
-		# Debug reasons only
-		console.log @angle*180/Math.PI, dy/dx
-
-		#Shot laser
-		@laser.clear @position, @front()
-		@laser.advance(1)
-
-	collided: (p) ->
-		Physics.Collision.circle(p, @position, @radius)
-
-	draw: (context, selected) ->
-		color = '#ffffff'
-		if selected
-			color = '#ff0000'
-		drawer.polygon(context, "stroke", @angle, @position, 3, @radius, {width: 1, color: color})
+		if @selectedGun
+			star.glow = off for star in @stars
+			@shoted = true
+			@selectedGun.shot(pos)
 
 
-class Laser
-	path: null
-	color: null
-	velocity: null
+	collisionEffect: (a, gun) ->
+		if a and a.type is "Mirror"
+			@reflect a, gun
+		if a and a.type is "Star"
+			a.glow = on
+			gun.laser.advance()
+		
+	reflect: (mirror, gun) ->
+		angle = mirror.reflect gun.laser.angle()
 
-	constructor: (origin={x:0, y: 0}) ->
-		@path = []
-		@color = 
-			r: 255
-			g: 255
-			b: 255
-		@velocity = new Physics.Vector
-		@velocity.magnitude 1
-		@path.push(origin) if origin
+		pos = gun.laser.last()
+		#slope = Math.abs(Math.tan(angle*Math.PI/180))
+		pos.x -= 20*Math.cos(angle)
+		pos.y -= 20*Math.sin(angle)
+		gun.laser.addPoint pos
 
 
-	addPoint: (p) ->
-		@path.push p
-		@velocity.angle @angle(p)
+	collided: (pos) ->
+		if pos.x <= 0 or pos.x >= @width or pos.y <= 0 or pos.y >= @height
+			return {type: "Wall"}
+		return obstacle for obstacle in @obstacles when obstacle.collided(pos)
+		return mirror for mirror in @mirrors when mirror.collided(pos)
+		return star for star in @stars when star.collided(pos)
+		return gun for gun in @guns when gun.collided(pos)
+		return null
 
-	angle: (point=-1) ->
-		[dy, dx] = @changeRate(point)
 
-		return Math.atan2(dy, dx)
+	addMirror: (pos, angle=0, width=100) ->
+		@mirrors.push new Mirror.Plane pos, angle, width
 
-	changeRate: (point=-1) ->
-		point = @path.length + point if point < 0
-		if point < @path.length and point > 0
-			dx = @path[point].x - @path[point-1].x
-			dy = @path[point].y - @path[point-1].y
+	addStar: (pos, radius) ->
+		@stars.push new Star pos, radius
 
-			return [dy, dx]
-		return [0, 0]
+	addWall: (pos, angle=0, width) ->
+		@obstacles.push new Wall pos, angle, width
 
-	last: (p) -> 
-		if p
-			if @path.length > 1
-				@path[@path.length-1] = p
+	selectGun: (pos) ->
+		r = false
+		for gun in @guns when gun.collided(pos)
+			r = true
+			@selectedGun = if @selectedGun is gun then null else gun
+		return r
+
+
+
+	draw: () ->
+		#Clear the canvas
+		###
+		@context.save()
+
+		@context.setTransform(1, 0, 0, 1, 0, 0)
+		@context.clearRect 0, 0, @width, @height
+
+		@context.restore()
+		###
+
+		#Draw background
+
+		@context.fillRect 0, 0, @width, @height
+
+		mirror.draw @context for mirror in @mirrors
+		obstacle.draw @context for obstacle in @obstacles
+		for gun in @guns
+			gun.laser.draw @context
+			if @selectedGun is gun
+				gun.draw @context, true
 			else
-				@path[@path.length] = p
-		x: @path[@path.length-1].x
-		y: @path[@path.length-1].y
+				gun.draw @context
 
-	advance: () ->
-		@path[@path.length-1].x += @velocity.magnitude()*Math.cos(@angle())
-		@path[@path.length-1].y += @velocity.magnitude()*Math.sin(@angle())
-
-	clear: () ->
-		@path = []
-		@path.push point for point in arguments
+		star.draw @context for star in @stars
 
 
-	draw: (context) ->
-		if @path.length > 1
-			for i in [5..0]
-				lineWidth = (i+1)*4-2
-				color = if i is 0 then '#fff' else "rgba(#{@color.r}, #{@color.g}, #{@color.b}, 0.2)"
-				drawer.path context, @path, {color: color, width: lineWidth}
-class Star
-	radius: 10
-	position: null
-	glow: off
-	type: "Star"
-	stage: 0
-	stageMod: 1
+	animate: () ->
+		# Every time function is executed, the laser advances a little bit
+		for gun in @guns
+			coll = @collided(gun.laser.last())
+			if ! coll and @shoted
+				i = 0
+				while ! coll and i < 10
+					gun.laser.advance()
+					i++
+					coll = @collided(gun.laser.last())
+					@collisionEffect coll, gun
+			else # if laser animation is finished, just do the laser maintenance
+				if coll
+					@collisionEffect coll, gun
+				else
+					@shoted = false# if @collided(@gun.laser.last()) is "wall"
 
-	constructor: (pos={x:0, y:0}, @radius=1) ->
-		@position =
-			x: pos.x
-			y: pos.y
+		#m.turn 0 for m in @mirrors
+			
+		setTimeout => 
+			@animate()
+		, 1000/60
 
-	collided: (point) ->
-		Geometry.dist2(@position, point) <= @radius*@radius
-
-	draw: (context) ->
-		#Animation
-		if @stage > 50 or @stage < 0
-			@stageMod *= -1
-		@stage += @stageMod
-
-		a = "stroke"
-		shadow = {color:'#fff', offsetX: 0, offsetY: 0, blur: 10}
-		if @glow is on
-			a = "fill"
-			shadow.color = '#aaeeff'
-			shadow.offsetX = 0
-			shadow.offsetY = 0
-			shadow.blur = @stage/2
-			#drawer.arc context, a, @position, 0, 360, @radius*1.7, {color: 'rgba(250, 250, 250, 0.2'}
-		drawer.arc context, a, @position, 0, 360, @radius, {color: '#fff', shadow: shadow }
-
-window.Star = Star
-window.PlaneMirror = PlaneMirror
-window.LaserGun = LaserGun
-window.Wall = Wall
+window.Board = Board

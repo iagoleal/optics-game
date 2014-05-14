@@ -1,0 +1,28 @@
+{
+	"width": 800,
+	"height": 600,
+	"mirrors": 
+		[
+			//{ x: , y: , angle: }
+			{"x": 600, "y": 70, 	"angle":Math.PI/4 }
+			{"x": 200, "y": 70, 	"angle": -Math.PI/4 }
+			{"x": 400, "y": 70, 	"angle": 0 }
+			{"x": 200, "y": 600-70, "angle": Math.PI + Math.PI/4 }
+			{"x": 600, "y": 600-70, "angle": Math.PI - Math.PI/4 }
+			{"x": 400, "y": 600-70, "angle": Math.PI/2 }
+			{"x": 700, "y": 300, 	"angle": Math.PI/4 }
+		]
+
+	"obstacles":
+		[
+			//{ x: , y: , angle: , width}
+			{ "x": 100, "y": 300, "angle": -Math.PI/2, "width": 100}
+		]
+
+	"stars":
+		[
+			//{x: , y: , radius: }
+			{"x": 200, "y": 350, "radius": 10}
+			{"x": 100, "y": 450, "radius": 10}
+		]
+}

@@ -36,6 +36,8 @@
 
     Turnable.prototype.angle = 0;
 
+    Turnable.prototype.turnable = true;
+
     function Turnable(pos, angle) {
       if (pos == null) {
         pos = {
