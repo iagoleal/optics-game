@@ -29,9 +29,6 @@ class Board
 		@obstacles = []
 		@stars = []
 
-		@guns.push new LaserGun {x: @width/2, y: @height/2}, 0
-		@guns.push new LaserGun {x: @width/3, y: @width/3}, 0
-
 
 	shot: (pos) ->
 		if @selectedGun
@@ -67,14 +64,27 @@ class Board
 		return null
 
 
-	addMirror: (pos, angle=0, width=100) ->
-		@mirrors.push new Mirror.Plane pos, angle, width
-
-	addStar: (pos, radius) ->
-		@stars.push new Star pos, radius
-
-	addWall: (pos, angle=0, width) ->
-		@obstacles.push new Wall pos, angle, width
+	setLevel: (lv) ->
+		for index, data of lv
+			switch index
+				when "width"
+					@width = data
+				when "height"
+					@height = data
+				when "mirrors"
+					for m in data
+						# if m.type is "plane"
+						@mirrors.push new Mirror.Plane {x: m.x, y: m.y}, m.angle, m.width, m.turnable
+				when "obstacles"
+					for m in data
+						if m.type is "wall"
+							@obstacles.push new Wall {x: m.x, y: m.y}, m.angle, m.width
+				when "stars"
+					for m in data
+						@stars.push new Star {x: m.x, y: m.y}, m.radius
+				when "guns"
+					for m in data
+						@guns.push new LaserGun {x: m.x, y: m.y}, m.angle, m.turnable
 
 	selectGun: (pos) ->
 		r = false
@@ -104,10 +114,9 @@ class Board
 		obstacle.draw @context for obstacle in @obstacles
 		for gun in @guns
 			gun.laser.draw @context
-			if @selectedGun is gun
-				gun.draw @context, true
-			else
-				gun.draw @context
+
+			isG = (@selectedGun is gun)
+			gun.draw @context, isG
 
 		star.draw @context for star in @stars
 

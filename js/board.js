@@ -36,14 +36,6 @@
       this.mirrors = [];
       this.obstacles = [];
       this.stars = [];
-      this.guns.push(new LaserGun({
-        x: this.width / 2,
-        y: this.height / 2
-      }, 0));
-      this.guns.push(new LaserGun({
-        x: this.width / 3,
-        y: this.width / 3
-      }, 0));
     }
 
     Board.prototype.shot = function(pos) {
@@ -116,25 +108,83 @@
       return null;
     };
 
-    Board.prototype.addMirror = function(pos, angle, width) {
-      if (angle == null) {
-        angle = 0;
+    Board.prototype.setLevel = function(lv) {
+      var data, index, m, _results;
+      _results = [];
+      for (index in lv) {
+        data = lv[index];
+        switch (index) {
+          case "width":
+            _results.push(this.width = data);
+            break;
+          case "height":
+            _results.push(this.height = data);
+            break;
+          case "mirrors":
+            _results.push((function() {
+              var _i, _len, _results1;
+              _results1 = [];
+              for (_i = 0, _len = data.length; _i < _len; _i++) {
+                m = data[_i];
+                _results1.push(this.mirrors.push(new Mirror.Plane({
+                  x: m.x,
+                  y: m.y
+                }, m.angle, m.width, m.turnable)));
+              }
+              return _results1;
+            }).call(this));
+            break;
+          case "obstacles":
+            _results.push((function() {
+              var _i, _len, _results1;
+              _results1 = [];
+              for (_i = 0, _len = data.length; _i < _len; _i++) {
+                m = data[_i];
+                if (m.type === "wall") {
+                  _results1.push(this.obstacles.push(new Wall({
+                    x: m.x,
+                    y: m.y
+                  }, m.angle, m.width)));
+                } else {
+                  _results1.push(void 0);
+                }
+              }
+              return _results1;
+            }).call(this));
+            break;
+          case "stars":
+            _results.push((function() {
+              var _i, _len, _results1;
+              _results1 = [];
+              for (_i = 0, _len = data.length; _i < _len; _i++) {
+                m = data[_i];
+                _results1.push(this.stars.push(new Star({
+                  x: m.x,
+                  y: m.y
+                }, m.radius)));
+              }
+              return _results1;
+            }).call(this));
+            break;
+          case "guns":
+            _results.push((function() {
+              var _i, _len, _results1;
+              _results1 = [];
+              for (_i = 0, _len = data.length; _i < _len; _i++) {
+                m = data[_i];
+                _results1.push(this.guns.push(new LaserGun({
+                  x: m.x,
+                  y: m.y
+                }, m.angle, m.turnable)));
+              }
+              return _results1;
+            }).call(this));
+            break;
+          default:
+            _results.push(void 0);
+        }
       }
-      if (width == null) {
-        width = 100;
-      }
-      return this.mirrors.push(new Mirror.Plane(pos, angle, width));
-    };
-
-    Board.prototype.addStar = function(pos, radius) {
-      return this.stars.push(new Star(pos, radius));
-    };
-
-    Board.prototype.addWall = function(pos, angle, width) {
-      if (angle == null) {
-        angle = 0;
-      }
-      return this.obstacles.push(new Wall(pos, angle, width));
+      return _results;
     };
 
     Board.prototype.selectGun = function(pos) {
@@ -162,7 +212,7 @@
       		@context.restore()
       */
 
-      var gun, mirror, obstacle, star, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _results;
+      var gun, isG, mirror, obstacle, star, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _results;
       this.context.fillRect(0, 0, this.width, this.height);
       _ref = this.mirrors;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -178,11 +228,8 @@
       for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
         gun = _ref2[_k];
         gun.laser.draw(this.context);
-        if (this.selectedGun === gun) {
-          gun.draw(this.context, true);
-        } else {
-          gun.draw(this.context);
-        }
+        isG = this.selectedGun === gun;
+        gun.draw(this.context, isG);
       }
       _ref3 = this.stars;
       _results = [];

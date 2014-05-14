@@ -23,7 +23,7 @@ class Geometry.Turnable
 	angle: 0
 	turnable: on #Says if you can turn the object or not
 
-	constructor: (pos={x:0, y:0},@angle=0) ->
+	constructor: (pos={x:0, y:0},@angle=0, @turnable: true) ->
 		@position =
 			x: pos.x
 			y: pos.y
@@ -45,7 +45,7 @@ class Geometry.Rectangle extends Geometry.Turnable
 	height: 10
 
 	constructor: (pos={x:0, y:0}, @angle=0,  @width=100, @height=10) ->
-		super pos, angle
+		super pos, @angle
 
 
 	collided: (point) ->

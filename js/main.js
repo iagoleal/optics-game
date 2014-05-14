@@ -7,46 +7,7 @@
       _this = this;
     window.board = new Board("board");
     window.buttons = new Interface("buttons");
-    window.board.addMirror({
-      x: 600,
-      y: 70
-    }, Math.PI / 4);
-    window.board.addMirror({
-      x: 200,
-      y: 70
-    }, -Math.PI / 4);
-    window.board.addMirror({
-      x: 400,
-      y: 70
-    }, 0);
-    window.board.addMirror({
-      x: 200,
-      y: 600 - 70
-    }, Math.PI + Math.PI / 4);
-    window.board.addMirror({
-      x: 600,
-      y: 600 - 70
-    }, Geometry.rad(135));
-    window.board.addMirror({
-      x: 400,
-      y: 600 - 70
-    }, Geometry.rad(90));
-    window.board.addMirror({
-      x: 700,
-      y: 300
-    }, Geometry.rad(45));
-    window.board.addWall({
-      x: 100,
-      y: 300
-    }, Geometry.rad(270), 100);
-    window.board.addStar({
-      x: 200,
-      y: 350
-    }, 10);
-    window.board.addStar({
-      x: 100,
-      y: 450
-    }, 10);
+    board.setLevel(Levels.test);
     window.board.animate();
     clickTimer = false;
     longPress = false;

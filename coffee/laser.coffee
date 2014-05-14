@@ -5,7 +5,7 @@ class LaserGun extends Geometry.Turnable
 	laser: null
 	img: null
 
-	constructor: (pos={x:0, y:0},@angle=0) ->
+	constructor: (pos={x:0, y:0},@angle=0, @turnable=true) ->
 		@position =
 			x: pos.x
 			y: pos.y

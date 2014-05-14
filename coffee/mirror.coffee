@@ -2,7 +2,10 @@ module 'Mirror'
 
 class Mirror.Plane extends Geometry.Rectangle
 	type: "Mirror"
-	height: 4
+	height: 10
+
+	constructor: (pos={x:0, y:0}, @angle=0,  @width=100, @turnable=true) ->
+		super pos, @angle, @width, @height
 
 	reflect: (ang) ->
 		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)

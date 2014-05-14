@@ -13,7 +13,7 @@
 
     LaserGun.prototype.img = null;
 
-    function LaserGun(pos, angle) {
+    function LaserGun(pos, angle, turnable) {
       if (pos == null) {
         pos = {
           x: 0,
@@ -21,6 +21,7 @@
         };
       }
       this.angle = angle != null ? angle : 0;
+      this.turnable = turnable != null ? turnable : true;
       this.position = {
         x: pos.x,
         y: pos.y
