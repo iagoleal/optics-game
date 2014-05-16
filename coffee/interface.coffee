@@ -45,16 +45,23 @@ class Button
 
 class Turner
 	turnable: null
+	radius: 0
 
 	constructor: (@turnable={x:0, y:0}) ->
+		@radius = switch
+			when "radius" of @turnable
+				@turnable.radius
+			when "width" of @turnable
+				@turnable.width/2
 
 	pointTo: (pos) ->
 		center = @turnable.position
-		dy = center.y - pos.y
-		dx = center.x - pos.x
-		# Sets the new angle
-		# And shifts it by pi/2 so it's the center angle and not the border angle
-		@turnable.angle = Math.atan2(dy, dx) + Math.PI/2
+		if Physics.Collision.circle(pos, center, @radius+40)# and ! Physics.Collision.circle(pos, center, @radius)
+			dy = center.y - pos.y
+			dx = center.x - pos.x
+			# Sets the new angle
+			# And shifts it by pi/2 so it's the center angle and not the border angle
+			@turnable.angle = Math.atan2(dy, dx) + Math.PI/2
 
 	draw: (context) ->
 		radius = switch
@@ -62,7 +69,7 @@ class Turner
 				@turnable.radius
 			when "width" of @turnable
 				@turnable.width/2
-		drawer.arc context, "stroke", @turnable.position, 0, 2*Math.PI, radius+15, {color: "rgba(255, 255, 255, 0.5", width: 15}
+		drawer.arc context, "stroke", @turnable.position, 0, 2*Math.PI, radius+20, {color: "rgba(255, 255, 255, 0.5", width: 15}
 		#drawer.arc context, "clip", @turnable.position, 0, 360, radius+3, {color: "rgba(0, 0, 0, 0)"}
 
 window.Turner = Turner

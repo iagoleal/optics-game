@@ -16,12 +16,12 @@ class LaserGun extends Geometry.Turnable
 		y: @position.y + @radius*Math.sin(@angle)
 
 	shot: (pos) ->
-		#Set slope of first line
-		dy = pos.y - @position.y
-		dx = pos.x - @position.x
-
-		# Get angle from slope
-		@angle = Math.atan2(dy, dx) 
+		if @turnable
+			#Set slope of first line
+			dy = pos.y - @position.y
+			dx = pos.x - @position.x
+			# Get angle from slope
+			@angle = Math.atan2(dy, dx) 
 
 		# Debug reasons only
 		console.log @angle*180/Math.PI, dy/dx

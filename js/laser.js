@@ -38,9 +38,11 @@
 
     LaserGun.prototype.shot = function(pos) {
       var dx, dy;
-      dy = pos.y - this.position.y;
-      dx = pos.x - this.position.x;
-      this.angle = Math.atan2(dy, dx);
+      if (this.turnable) {
+        dy = pos.y - this.position.y;
+        dx = pos.x - this.position.x;
+        this.angle = Math.atan2(dy, dx);
+      }
       console.log(this.angle * 180 / Math.PI, dy / dx);
       this.laser.clear(this.position, this.front());
       return this.laser.advance(1);
