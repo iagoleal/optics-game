@@ -117,5 +117,16 @@ class Drawer
 
 		context.restore()
 
+	image: (context, img, x, y, angle, center, options = {}) ->
+		context.save()
+		
+		@setOptions(context, options)
+
+		context.translate(center.x, center.y)
+		context.rotate (angle)*@angleMod
+
+		context.drawImage(img, x, y)
+
+		context. restore()
 
 window.drawer = new Drawer

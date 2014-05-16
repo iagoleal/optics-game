@@ -14,6 +14,8 @@ class Board
 
 	shoted: false
 
+	images: null
+
 	constructor: (cv) ->
 		@canvas = document.getElementById(cv)
 		@context = @canvas.getContext "2d"
@@ -28,6 +30,7 @@ class Board
 		@mirrors = []
 		@obstacles = []
 		@stars = []
+		@images = {}
 
 
 	shot: (pos) ->
@@ -63,6 +66,19 @@ class Board
 		return gun for gun in @guns when gun.collided(pos)
 		return null
 
+	isetLevel: (lv) ->
+		counter = 0
+		can = false
+		for i, index in lv.images
+			@images[i.name] = new Image()
+			@images[i.name].onload = =>
+				counter += 1
+				if counter == lv.images.length
+					can = true
+			@images[i.name].src = i.src
+		if can
+			@_setLevel lv
+
 
 	setLevel: (lv) ->
 		for index, data of lv
@@ -84,7 +100,7 @@ class Board
 						@stars.push new Star {x: m.x, y: m.y}, m.radius
 				when "guns"
 					for m in data
-						@guns.push new LaserGun {x: m.x, y: m.y}, m.angle, m.turnable
+						@guns.push new LaserGun {x: m.x, y: m.y}, m.angle, m.turnable, @images[m.image]
 
 	selectGun: (pos) ->
 		r = false

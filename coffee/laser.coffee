@@ -5,7 +5,7 @@ class LaserGun extends Geometry.Turnable
 	laser: null
 	img: null
 
-	constructor: (pos={x:0, y:0},@angle=0, @turnable=true) ->
+	constructor: (pos={x:0, y:0},@angle=0, @turnable=true, @img) ->
 		@position =
 			x: pos.x
 			y: pos.y
@@ -34,6 +34,9 @@ class LaserGun extends Geometry.Turnable
 		Physics.Collision.circle(p, @position, @radius)
 
 	draw: (context, selected) ->
+
+		#drawer.image context, @img, @position.x, @position.y, @angle, @position
+
 		color = '#ffffff'
 		if selected
 			color = '#ff0000'
@@ -54,7 +57,6 @@ class Laser
 		@velocity = new Physics.Vector
 		@velocity.magnitude 1
 		@path.push(origin) if origin
-
 
 	addPoint: (p) ->
 		@path.push p
