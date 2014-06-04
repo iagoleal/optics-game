@@ -164,6 +164,18 @@
       return context.restore();
     };
 
+    Drawer.prototype.image = function(context, img, x, y, angle, center, options) {
+      if (options == null) {
+        options = {};
+      }
+      context.save();
+      this.setOptions(context, options);
+      context.translate(center.x, center.y);
+      context.rotate(angle * this.angleMod);
+      context.drawImage(img, x, y);
+      return context.restore();
+    };
+
     return Drawer;
 
   })();

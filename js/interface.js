@@ -81,19 +81,31 @@
   Turner = (function() {
     Turner.prototype.turnable = null;
 
+    Turner.prototype.radius = 0;
+
     function Turner(turnable) {
       this.turnable = turnable != null ? turnable : {
         x: 0,
         y: 0
       };
+      this.radius = (function() {
+        switch (false) {
+          case !("radius" in this.turnable):
+            return this.turnable.radius;
+          case !("width" in this.turnable):
+            return this.turnable.width / 2;
+        }
+      }).call(this);
     }
 
     Turner.prototype.pointTo = function(pos) {
       var center, dx, dy;
       center = this.turnable.position;
-      dy = center.y - pos.y;
-      dx = center.x - pos.x;
-      return this.turnable.angle = Math.atan2(dy, dx) + Math.PI / 2;
+      if (Physics.Collision.circle(pos, center, this.radius + 40)) {
+        dy = center.y - pos.y;
+        dx = center.x - pos.x;
+        return this.turnable.angle = Math.atan2(dy, dx) + Math.PI / 2;
+      }
     };
 
     Turner.prototype.draw = function(context) {
@@ -106,7 +118,7 @@
             return this.turnable.width / 2;
         }
       }).call(this);
-      return drawer.arc(context, "stroke", this.turnable.position, 0, 2 * Math.PI, radius + 15, {
+      return drawer.arc(context, "stroke", this.turnable.position, 0, 2 * Math.PI, radius + 20, {
         color: "rgba(255, 255, 255, 0.5",
         width: 15
       });

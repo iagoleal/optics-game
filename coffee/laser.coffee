@@ -5,7 +5,7 @@ class LaserGun extends Geometry.Turnable
 	laser: null
 	img: null
 
-	constructor: (pos={x:0, y:0},@angle=0, @turnable=true) ->
+	constructor: (pos={x:0, y:0},@angle=0, @turnable=true, @img) ->
 		@position =
 			x: pos.x
 			y: pos.y
@@ -16,12 +16,12 @@ class LaserGun extends Geometry.Turnable
 		y: @position.y + @radius*Math.sin(@angle)
 
 	shot: (pos) ->
-		#Set slope of first line
-		dy = pos.y - @position.y
-		dx = pos.x - @position.x
-
-		# Get angle from slope
-		@angle = Math.atan2(dy, dx) 
+		if @turnable
+			#Set slope of first line
+			dy = pos.y - @position.y
+			dx = pos.x - @position.x
+			# Get angle from slope
+			@angle = Math.atan2(dy, dx) 
 
 		# Debug reasons only
 		console.log @angle*180/Math.PI, dy/dx
@@ -35,6 +35,9 @@ class LaserGun extends Geometry.Turnable
 		Physics.Collision.circle(p, @position, @radius)
 
 	draw: (context, selected) ->
+
+		#drawer.image context, @img, @position.x, @position.y, @angle, @position
+
 		color = '#ffffff'
 		if selected
 			color = '#ff0000'
@@ -54,7 +57,6 @@ class Laser
 			b: 255
 		@velocity = 1
 		#@path.push(origin) if origin
-
 
 	addPoint: (p, angle) ->
 		@path.push new Physics.Vector 0, angle, p

@@ -23,6 +23,8 @@
 
     Board.prototype.shoted = false;
 
+    Board.prototype.images = null;
+
     function Board(cv) {
       this.canvas = document.getElementById(cv);
       this.context = this.canvas.getContext("2d");
@@ -36,6 +38,7 @@
       this.mirrors = [];
       this.obstacles = [];
       this.stars = [];
+      this.images = {};
     }
 
     Board.prototype.shot = function(pos) {
@@ -111,6 +114,28 @@
       return null;
     };
 
+    Board.prototype.isetLevel = function(lv) {
+      var can, counter, i, index, _i, _len, _ref,
+        _this = this;
+      counter = 0;
+      can = false;
+      _ref = lv.images;
+      for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+        i = _ref[index];
+        this.images[i.name] = new Image();
+        this.images[i.name].onload = function() {
+          counter += 1;
+          if (counter === lv.images.length) {
+            return can = true;
+          }
+        };
+        this.images[i.name].src = i.src;
+      }
+      if (can) {
+        return this._setLevel(lv);
+      }
+    };
+
     Board.prototype.setLevel = function(lv) {
       var data, index, m, _results;
       _results = [];
@@ -178,7 +203,7 @@
                 _results1.push(this.guns.push(new LaserGun({
                   x: m.x,
                   y: m.y
-                }, m.angle, m.turnable)));
+                }, m.angle, m.turnable, this.images[m.image])));
               }
               return _results1;
             }).call(this));

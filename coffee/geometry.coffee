@@ -5,8 +5,12 @@ Geometry.dist2 = (p1, p2) ->
 
 Geometry.distance = (p1, p2) -> Math.sqrt(Geometry.dist2(p1, p2))
 
-Geometry.rad = (ang) ->
+Geometry.dist = Geometry.distance
+
+Geometry.radians = (ang) ->	
 	ang * Math.PI/180
+
+Geometry.rad = Geometry.radians
 
 Geometry.reduceAngle = (ang) ->
 	if ang > 0

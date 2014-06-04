@@ -29,7 +29,11 @@ Levels.test = {
 	"guns":
 		[
 			//{ x: , y: , angle: , turnable: }
-			{ "x": 400,	  "y": 300, "angle": 0, "turnable": true},
-			{ "x": 800/3, "y": 200, "angle": 0, "turnable": false}
+			{ "x": 400,	  "y": 300, "angle": 0, "turnable": true, "image": "gun"},
+			{ "x": 750, "y": 550, "angle": Math.PI + Math.PI/4, "turnable": false, "image": "gun"}
+		],
+	"images":
+		[
+			{"name":"gun", "src": "content/img/ringringring.png"}
 		]
 }
