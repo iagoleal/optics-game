@@ -53,13 +53,6 @@ class Laser.Base
 	color: null
 	velocity: 0
 
-	shot: (p, angle) ->
-		@clear()
-		@addPoint(p, angle)
-
-# The most used laser
-class Laser.Long extends Laser.Base
-
 	constructor: () ->
 		@path = []
 		@color = 
@@ -67,16 +60,6 @@ class Laser.Long extends Laser.Base
 			g: 255
 			b: 255
 		@velocity = 3
-		#@path.push(origin) if origin
-
-	addPoint: (p, angle) ->
-
-		@path.push new Physics.Vector @velocity+1, angle, p
-		#@velocity.angle = @angle(p)
-
-	advance: () ->
-		if @path.length >= 1
-			@path[@path.length-1].magnitude += @velocity
 
 	angle: () ->
 		@path[@path.length-1].angle
@@ -89,6 +72,24 @@ class Laser.Long extends Laser.Base
 		if @path.length
 			return @path[@path.length-1].position() 
 
+	shot: (p, angle) ->
+		@clear()
+		@addPoint(p, angle)
+
+	advance: () ->
+	addPoint: () ->
+	draw: () ->
+
+# The most used laser
+class Laser.Long extends Laser.Base
+
+	addPoint: (p, angle) ->
+		@path.push new Physics.Vector @velocity+1, angle, p
+
+	advance: () ->
+		if @path.length >= 1
+			@path[@path.length-1].magnitude += @velocity
+
 	draw: (context) ->
 		if @path.length
 			for i in [5..0]
@@ -99,36 +100,23 @@ class Laser.Long extends Laser.Base
 class Laser.Short extends Laser.Base
 	size: 0
 
-	constructor: (@size=20, angle, p) ->
-		@path = new Physics.Vector size, angle, p
-		@color = 
-			r: 255
-			g: 255
-			b: 255
-		@velocity = 3
+	constructor: (@size=20) ->
+		super
 
 	addPoint: (p, angle) ->
-		@path = null
-		@path = new Physics.Vector @size, angle, p
+		@path = []
+		@path.push new Physics.Vector @size, angle, p
 
 	advance: () ->
-		@path.origin.x += @velocity*Math.cos(@path.angle)
-		@path.origin.y += @velocity*Math.sin(@path.angle)
-
-	angle: () ->
-		@path.angle
-
-	clear: () ->
-		@path = null
-
-	last: () ->
-		@path.position()
+		for ray in @path
+			ray.origin.x += @velocity*Math.cos(ray.angle)
+			ray.origin.y += @velocity*Math.sin(ray.angle)
 
 	draw: (context) ->
-		if @path
+		for ray in @path 
 			for i in [5..0]
 				lineWidth = (i+1)*4-2
 				color = if i is 0 then '#fff' else "rgba(#{@color.r}, #{@color.g}, #{@color.b}, 0.2)"
-				drawer.line context, @path.origin, @path.position() ,{color: color, width: lineWidth}	
+				drawer.line context, ray.origin, ray.position() ,{color: color, width: lineWidth}	
 
 window.LaserGun = LaserGun
