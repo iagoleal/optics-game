@@ -65,10 +65,9 @@
     };
 
     Board.prototype.reflect = function(mirror, gun) {
-      var angle, pos;
+      var angle;
       angle = mirror.reflect(gun.laser.angle());
-      pos = gun.laser.last();
-      return gun.laser.addPoint(pos, angle);
+      return gun.laser.addPoint(gun.laser.last(), angle);
     };
 
     Board.prototype.collided = function(pos) {
@@ -201,7 +200,7 @@
                 _results1.push(this.guns.push(new LaserGun({
                   x: m.x,
                   y: m.y
-                }, m.angle, m.turnable, this.images[m.image])));
+                }, m.angle, m.turnable, m.laser)));
               }
               return _results1;
             }).call(this));
