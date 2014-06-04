@@ -17,34 +17,15 @@
       }
       this.origin = {};
       this.origin.x = o.x || 0;
-      this.origin.x = o.y || 0;
+      this.origin.y = o.y || 0;
     }
 
     Vector.prototype.position = function() {
       return {
-        x: this.magnitude * Math.cos(this.angle),
-        y: this.magnitude * Math.sin(this.angle)
+        x: this.origin.x + this.magnitude * Math.cos(this.angle),
+        y: this.origin.y + this.magnitude * Math.sin(this.angle)
       };
     };
-
-    /*
-    	magnitude: (n) ->  
-    		d = Geometry.distance({x: 0, y:0}, {x: @x, y: @y})
-    		if n
-    			d = n
-    			@x = d * Math.cos(@angle())
-    			@y = d * Math.sin(@angle())
-    		return d
-    
-    	angle: (t) ->
-    		a = Math.atan2(@y, @x)
-    		if t
-    			a = t
-    			@x = @magnitude * Math.cos(a)
-    			@y = @magnitude * Math.sin(a)
-    		return a
-    */
-
 
     return Vector;
 

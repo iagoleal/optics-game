@@ -13,7 +13,7 @@ class Mirror.Plane extends Geometry.Rectangle
 
 		console.log "a", (2*Math.PI - ang + 2*mangle)*180/Math.PI
 
-		return Geometry.reduceAngle( 2*Math.PI - ang + 2*mangle )
+		return Geometry.reduceAngle( Math.PI - ang + 2*mangle )
 
 
 	draw: (context) ->

@@ -22,14 +22,13 @@ class LaserGun extends Geometry.Turnable
 			dx = pos.x - @position.x
 			# Get angle from slope
 			@angle = Math.atan2(dy, dx) 
+			# Debug reasons only
+			console.log @angle*180/Math.PI, dy/dx
 
-		# Debug reasons only
-		console.log @angle*180/Math.PI, dy/dx
 
 		#Shot laser
 		@laser.clear()
-		@laser.addPoint()
-		@laser.advance(1)
+		@laser.addPoint(@front(), @angle)
 
 	collided: (p) ->
 		Physics.Collision.circle(p, @position, @radius)
@@ -49,54 +48,43 @@ class Laser
 	color: null
 	velocity: 0
 
-	constructor: (origin={x:0, y: 0}) ->
+	constructor: () ->
 		@path = []
 		@color = 
 			r: 255
 			g: 255
 			b: 255
-		@velocity = 1
+		@velocity = 3
 		#@path.push(origin) if origin
 
 	addPoint: (p, angle) ->
-		@path.push new Physics.Vector 0, angle, p
+
+		@path.push new Physics.Vector 10, angle, p
 		#@velocity.angle = @angle(p)
 
-	angle: (point=-1) ->
-		[dy, dx] = @changeRate(point)
+	angle: () ->
+		@path[@path.length-1].angle
 
-		return Math.atan2(dy, dx)
-
-	changeRate: (point=-1) ->
-		point = @path.length + point if point < 0
-		if point < @path.length and point > 0
-			dx = @path[point].x - @path[point-1].x
-			dy = @path[point].y - @path[point-1].y
-
-			return [dy, dx]
-		return [0, 0]
 
 	last: () -> 
 		if @path.length
 			return @path[@path.length-1].position() 
-		else
-			return 
 
 	advance: () ->
-		if @path.length
+		if @path.length >= 1
 			@path[@path.length-1].magnitude += @velocity
 	
 
 	clear: () ->
 		@path = []
-		@path.push point for point in arguments
+		#@path.push point for point in arguments
 
 
 	draw: (context) ->
-		if @path.length > 1
+		if @path.length
 			for i in [5..0]
 				lineWidth = (i+1)*4-2
 				color = if i is 0 then '#fff' else "rgba(#{@color.r}, #{@color.g}, #{@color.b}, 0.2)"
-				drawer.path context, @path, {color: color, width: lineWidth}
+				drawer.path context, @path ,{color: color, width: lineWidth}
 
 window.LaserGun = LaserGun

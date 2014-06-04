@@ -52,9 +52,8 @@ class Board
 
 		pos = gun.laser.last()
 		#slope = Math.abs(Math.tan(angle*Math.PI/180))
-		pos.x -= 20*Math.cos(angle)
-		pos.y -= 20*Math.sin(angle)
-		gun.laser.addPoint pos
+
+		gun.laser.addPoint pos, angle
 
 
 	collided: (pos) ->

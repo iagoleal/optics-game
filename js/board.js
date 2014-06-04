@@ -68,9 +68,7 @@
       var angle, pos;
       angle = mirror.reflect(gun.laser.angle());
       pos = gun.laser.last();
-      pos.x -= 20 * Math.cos(angle);
-      pos.y -= 20 * Math.sin(angle);
-      return gun.laser.addPoint(pos);
+      return gun.laser.addPoint(pos, angle);
     };
 
     Board.prototype.collided = function(pos) {

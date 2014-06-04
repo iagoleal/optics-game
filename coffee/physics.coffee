@@ -8,30 +8,13 @@ class Physics.Vector
 	constructor: (@magnitude=0, @angle=0, o={}) ->
 		@origin = {}
 		@origin.x = o.x or 0
-		@origin.x = o.y or 0
+		@origin.y = o.y or 0
 
 
 	position: -> 
-		x: @magnitude*Math.cos(@angle)
-		y: @magnitude*Math.sin(@angle)
+		x: @origin.x + @magnitude*Math.cos(@angle)
+		y: @origin.y + @magnitude*Math.sin(@angle)
 
-	###
-	magnitude: (n) ->  
-		d = Geometry.distance({x: 0, y:0}, {x: @x, y: @y})
-		if n
-			d = n
-			@x = d * Math.cos(@angle())
-			@y = d * Math.sin(@angle())
-		return d
-
-	angle: (t) ->
-		a = Math.atan2(@y, @x)
-		if t
-			a = t
-			@x = @magnitude * Math.cos(a)
-			@y = @magnitude * Math.sin(a)
-		return a
-	###
 
 
 Physics.Optics = 

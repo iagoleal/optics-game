@@ -105,19 +105,21 @@
     };
 
     Drawer.prototype.path = function(context, points, options) {
-      var p, _i, _len, _ref;
+      var p, r, _i, _len, _ref;
       if (options == null) {
         options = {};
       }
       context.save();
       this.setOptions(context, options);
       context.beginPath();
-      context.moveTo(points[0].x, points[0].y);
+      context.moveTo(points[0].origin.x, points[0].origin.y);
       _ref = points.slice(1);
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
-        context.lineTo(p.x, p.y);
+        context.lineTo(p.origin.x, p.origin.y);
       }
+      r = points[points.length - 1].position();
+      context.lineTo(r.x, r.y);
       context.stroke();
       context.closePath();
       return context.restore();
