@@ -42,7 +42,8 @@
       dx = pos.x - this.position.x;
       this.angle = Math.atan2(dy, dx);
       console.log(this.angle * 180 / Math.PI, dy / dx);
-      this.laser.clear(this.position, this.front());
+      this.laser.clear();
+      this.laser.addPoint();
       return this.laser.advance(1);
     };
 
@@ -71,7 +72,7 @@
 
     Laser.prototype.color = null;
 
-    Laser.prototype.velocity = null;
+    Laser.prototype.velocity = 0;
 
     function Laser(origin) {
       if (origin == null) {
@@ -86,16 +87,11 @@
         g: 255,
         b: 255
       };
-      this.velocity = new Physics.Vector;
-      this.velocity.magnitude(1);
-      if (origin) {
-        this.path.push(origin);
-      }
+      this.velocity = 1;
     }
 
-    Laser.prototype.addPoint = function(p) {
-      this.path.push(p);
-      return this.velocity.angle(this.angle(p));
+    Laser.prototype.addPoint = function(p, angle) {
+      return this.path.push(new Physics.Vector(0, angle, p));
     };
 
     Laser.prototype.angle = function(point) {
@@ -123,23 +119,18 @@
       return [0, 0];
     };
 
-    Laser.prototype.last = function(p) {
-      if (p) {
-        if (this.path.length > 1) {
-          this.path[this.path.length - 1] = p;
-        } else {
-          this.path[this.path.length] = p;
-        }
+    Laser.prototype.last = function() {
+      if (this.path.length) {
+        return this.path[this.path.length - 1].position();
+      } else {
+
       }
-      return {
-        x: this.path[this.path.length - 1].x,
-        y: this.path[this.path.length - 1].y
-      };
     };
 
     Laser.prototype.advance = function() {
-      this.path[this.path.length - 1].x += this.velocity.magnitude() * Math.cos(this.angle());
-      return this.path[this.path.length - 1].y += this.velocity.magnitude() * Math.sin(this.angle());
+      if (this.path.length) {
+        return this.path[this.path.length - 1].magnitude += this.velocity;
+      }
     };
 
     Laser.prototype.clear = function() {

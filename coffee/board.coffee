@@ -55,6 +55,7 @@ class Board
 
 
 	collided: (pos) ->
+		return null if not pos
 		if pos.x <= 0 or pos.x >= @width or pos.y <= 0 or pos.y >= @height
 			return {type: "Wall"}
 		return obstacle for obstacle in @obstacles when obstacle.collided(pos)

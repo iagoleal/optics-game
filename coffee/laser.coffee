@@ -27,7 +27,8 @@ class LaserGun extends Geometry.Turnable
 		console.log @angle*180/Math.PI, dy/dx
 
 		#Shot laser
-		@laser.clear @position, @front()
+		@laser.clear()
+		@laser.addPoint()
 		@laser.advance(1)
 
 	collided: (p) ->
@@ -43,7 +44,7 @@ class LaserGun extends Geometry.Turnable
 class Laser
 	path: null
 	color: null
-	velocity: null
+	velocity: 0
 
 	constructor: (origin={x:0, y: 0}) ->
 		@path = []
@@ -51,14 +52,13 @@ class Laser
 			r: 255
 			g: 255
 			b: 255
-		@velocity = new Physics.Vector
-		@velocity.magnitude 1
-		@path.push(origin) if origin
+		@velocity = 1
+		#@path.push(origin) if origin
 
 
-	addPoint: (p) ->
-		@path.push p
-		@velocity.angle @angle(p)
+	addPoint: (p, angle) ->
+		@path.push new Physics.Vector 0, angle, p
+		#@velocity.angle = @angle(p)
 
 	angle: (point=-1) ->
 		[dy, dx] = @changeRate(point)
@@ -74,18 +74,16 @@ class Laser
 			return [dy, dx]
 		return [0, 0]
 
-	last: (p) -> 
-		if p
-			if @path.length > 1
-				@path[@path.length-1] = p
-			else
-				@path[@path.length] = p
-		x: @path[@path.length-1].x
-		y: @path[@path.length-1].y
+	last: () -> 
+		if @path.length
+			return @path[@path.length-1].position() 
+		else
+			return 
 
 	advance: () ->
-		@path[@path.length-1].x += @velocity.magnitude()*Math.cos(@angle())
-		@path[@path.length-1].y += @velocity.magnitude()*Math.sin(@angle())
+		if @path.length
+			@path[@path.length-1].magnitude += @velocity
+	
 
 	clear: () ->
 		@path = []

@@ -1,11 +1,21 @@
 module 'Physics'
 
 class Physics.Vector
-	x: 0
-	y: 0
+	origin: null
+	magnitude: 0
+	angle: 0
 
-	constructor: (@x=0, @y=0) ->
+	constructor: (@magnitude=0, @angle=0, o={}) ->
+		@origin = {}
+		@origin.x = o.x or 0
+		@origin.x = o.y or 0
 
+
+	position: -> 
+		x: @magnitude*Math.cos(@angle)
+		y: @magnitude*Math.sin(@angle)
+
+	###
 	magnitude: (n) ->  
 		d = Geometry.distance({x: 0, y:0}, {x: @x, y: @y})
 		if n
@@ -21,7 +31,7 @@ class Physics.Vector
 			@x = @magnitude * Math.cos(a)
 			@y = @magnitude * Math.sin(a)
 		return a
-
+	###
 
 
 Physics.Optics = 

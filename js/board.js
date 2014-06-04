@@ -72,6 +72,9 @@
 
     Board.prototype.collided = function(pos) {
       var gun, mirror, obstacle, star, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+      if (!pos) {
+        return null;
+      }
       if (pos.x <= 0 || pos.x >= this.width || pos.y <= 0 || pos.y >= this.height) {
         return {
           type: "Wall"
