@@ -3,41 +3,28 @@
   module('Physics');
 
   Physics.Vector = (function() {
-    Vector.prototype.x = 0;
+    Vector.prototype.origin = null;
 
-    Vector.prototype.y = 0;
+    Vector.prototype.magnitude = 0;
 
-    function Vector(x, y) {
-      this.x = x != null ? x : 0;
-      this.y = y != null ? y : 0;
+    Vector.prototype.angle = 0;
+
+    function Vector(magnitude, angle, o) {
+      this.magnitude = magnitude != null ? magnitude : 0;
+      this.angle = angle != null ? angle : 0;
+      if (o == null) {
+        o = {};
+      }
+      this.origin = {};
+      this.origin.x = o.x || 0;
+      this.origin.y = o.y || 0;
     }
 
-    Vector.prototype.magnitude = function(n) {
-      var d;
-      d = Geometry.distance({
-        x: 0,
-        y: 0
-      }, {
-        x: this.x,
-        y: this.y
-      });
-      if (n) {
-        d = n;
-        this.x = d * Math.cos(this.angle());
-        this.y = d * Math.sin(this.angle());
-      }
-      return d;
-    };
-
-    Vector.prototype.angle = function(t) {
-      var a;
-      a = Math.atan2(this.y, this.x);
-      if (t) {
-        a = t;
-        this.x = this.magnitude * Math.cos(a);
-        this.y = this.magnitude * Math.sin(a);
-      }
-      return a;
+    Vector.prototype.position = function() {
+      return {
+        x: this.origin.x + this.magnitude * Math.cos(this.angle),
+        y: this.origin.y + this.magnitude * Math.sin(this.angle)
+      };
     };
 
     Vector.dotProduct = function(v1, v2) {

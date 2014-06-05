@@ -30,7 +30,7 @@
       mangle = this.angle <= Math.PI ? this.angle : this.angle - Math.PI;
       mangle = this.angle - Math.PI / 2;
       console.log("a", (2 * Math.PI - ang + 2 * mangle) * 180 / Math.PI);
-      return Geometry.reduceAngle(2 * Math.PI - ang + 2 * mangle);
+      return Geometry.reduceAngle(Math.PI - ang + 2 * mangle);
     };
 
     Plane.prototype.draw = function(context) {

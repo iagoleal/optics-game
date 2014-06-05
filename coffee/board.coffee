@@ -48,16 +48,13 @@ class Board
 			gun.laser.advance()
 		
 	reflect: (mirror, gun) ->
-		angle = mirror.reflect gun.laser.angle()
+		angle = mirror.reflect( gun.laser.angle() )
 
-		pos = gun.laser.last()
-		#slope = Math.abs(Math.tan(angle*Math.PI/180))
-		pos.x -= 20*Math.cos(angle)
-		pos.y -= 20*Math.sin(angle)
-		gun.laser.addPoint pos
+		gun.laser.addPoint gun.laser.last(), angle
 
 
 	collided: (pos) ->
+		return null if not pos
 		if pos.x <= 0 or pos.x >= @width or pos.y <= 0 or pos.y >= @height
 			return {type: "Wall"}
 		return obstacle for obstacle in @obstacles when obstacle.collided(pos)
@@ -100,7 +97,7 @@ class Board
 						@stars.push new Star {x: m.x, y: m.y}, m.radius
 				when "guns"
 					for m in data
-						@guns.push new LaserGun {x: m.x, y: m.y}, m.angle, m.turnable, @images[m.image]
+						@guns.push new LaserGun {x: m.x, y: m.y}, m.angle, m.turnable, m.laser
 
 	selectGun: (pos) ->
 		r = false

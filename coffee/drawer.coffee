@@ -73,10 +73,11 @@ class Drawer
 		@setOptions(context, options)
 
 		context.beginPath()
-		context.moveTo points[0].x, points[0].y
+		context.moveTo points[0].origin.x, points[0].origin.y
 		for p in points[1..]
-			context.lineTo p.x, p.y
-
+			context.lineTo p.origin.x, p.origin.y
+		r = points[points.length-1].position()
+		context.lineTo r.x, r.y
 		context.stroke()
 		context.closePath()
 

@@ -29,8 +29,8 @@ Levels.test = {
 	"guns":
 		[
 			//{ x: , y: , angle: , turnable: }
-			{ "x": 400,	  "y": 300, "angle": 0, "turnable": true, "image": "gun"},
-			{ "x": 750, "y": 550, "angle": Math.PI + Math.PI/4, "turnable": false, "image": "gun"}
+			{ "x": 400,	  "y": 300, "angle": 0, "turnable": true, "laser": "long", "image": "gun"},
+			{ "x": 750, "y": 550, "angle": Math.PI + Math.PI/4, "turnable": false, "laser": "short", "image": "gun"}
 		],
 	"images":
 		[
