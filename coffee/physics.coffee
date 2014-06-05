@@ -22,6 +22,12 @@ class Physics.Vector
 			@y = @magnitude * Math.sin(a)
 		return a
 
+	@dotProduct: (v1, v2) ->
+		(v1.x * v2.x) + (v1.y * v2.y)
+
+	@crossProduct: (v1, v2) ->
+		(v1.x * v2.y) - (v1.y * v2.x)
+
 
 
 Physics.Optics = 
