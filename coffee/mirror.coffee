@@ -8,12 +8,7 @@ class Mirror.Plane extends Geometry.Rectangle
 		super pos, @angle, @width, @height
 
 	reflect: (ang) ->
-		mangle = if @angle <= Math.PI then @angle else (@angle-Math.PI)
-		mangle = @angle - Math.PI/2
-
-		console.log "a", (2*Math.PI - ang + 2*mangle)*180/Math.PI
-
-		return Geometry.reduceAngle( Math.PI - ang + 2*mangle )
+		Geometry.reduceAngle(2*@angle - ang)
 
 
 	draw: (context) ->
