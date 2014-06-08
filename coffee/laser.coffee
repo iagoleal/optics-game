@@ -91,8 +91,12 @@ class Laser.Long extends Laser.Base
 		@path.push new Physics.Vector @velocity+1, angle, p
 
 	advance: () ->
-		if @path.length >= 1
+		if @path.length
 			@path[@path.length-1].magnitude += @velocity
+
+	reflect: (angle) ->
+		if @path.length
+			@path.push new Physics.Vector @velocity+1, angle, @path[@path.length-1].position()
 
 	restart: (p, angle) ->
 		if @path.length
@@ -124,6 +128,10 @@ class Laser.Short extends Laser.Base
 			ray.origin.y += @velocity*Math.sin(ray.angle)
 
 	restart: () ->
+
+	reflect: (angle) ->
+		if @path.length
+			@path.push new Physics.Vector @size, angle, @path[@path.length-1].position()
 
 	draw: (context) ->
 		for ray in @path 

@@ -67,7 +67,7 @@
     Board.prototype.reflect = function(mirror, gun) {
       var angle;
       angle = mirror.reflect(gun.laser.angle());
-      return gun.laser.addPoint(gun.laser.last(), angle);
+      return gun.laser.reflect(angle);
     };
 
     Board.prototype.collided = function(pos) {

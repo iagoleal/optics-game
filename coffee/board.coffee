@@ -50,7 +50,7 @@ class Board
 	reflect: (mirror, gun) ->
 		angle = mirror.reflect( gun.laser.angle() )
 
-		gun.laser.addPoint gun.laser.last(), angle
+		gun.laser.reflect angle
 
 
 	collided: (pos) ->

@@ -141,8 +141,14 @@
     };
 
     Long.prototype.advance = function() {
-      if (this.path.length >= 1) {
+      if (this.path.length) {
         return this.path[this.path.length - 1].magnitude += this.velocity;
+      }
+    };
+
+    Long.prototype.reflect = function(angle) {
+      if (this.path.length) {
+        return this.path.push(new Physics.Vector(this.velocity + 1, angle, this.path[this.path.length - 1].position()));
       }
     };
 
@@ -207,6 +213,12 @@
     };
 
     Short.prototype.restart = function() {};
+
+    Short.prototype.reflect = function(angle) {
+      if (this.path.length) {
+        return this.path.push(new Physics.Vector(this.size, angle, this.path[this.path.length - 1].position()));
+      }
+    };
 
     Short.prototype.draw = function(context) {
       var color, i, lineWidth, ray, _i, _len, _ref1, _results;
