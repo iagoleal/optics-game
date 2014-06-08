@@ -13,9 +13,13 @@
     return Math.sqrt(Geometry.dist2(p1, p2));
   };
 
-  Geometry.rad = function(ang) {
+  Geometry.dist = Geometry.distance;
+
+  Geometry.radians = function(ang) {
     return ang * Math.PI / 180;
   };
+
+  Geometry.rad = Geometry.radians;
 
   Geometry.reduceAngle = function(ang) {
     if (ang > 0) {
@@ -38,7 +42,7 @@
 
     Turnable.prototype.turnable = true;
 
-    function Turnable(pos, angle) {
+    function Turnable(pos, angle, turnable) {
       if (pos == null) {
         pos = {
           x: 0,
@@ -46,6 +50,7 @@
         };
       }
       this.angle = angle != null ? angle : 0;
+      this.turnable = turnable != null ? turnable : true;
       this.position = {
         x: pos.x,
         y: pos.y
@@ -53,12 +58,12 @@
     }
 
     Turnable.prototype.turn = function(dgr) {
-      this.angle += dgr;
-      if (this.angle > 2 * Math.PI) {
-        this.angle -= 2 * Math.PI;
-      } else if (this.angle < 0) {
-        this.angle += 2 * Math.PI;
-      }
+      this.angle = Geometry.reduceAngle(this.angle + dgr);
+      return this;
+    };
+
+    Turnable.prototype.turnTo = function(dgr) {
+      this.angle = Geometry.reduceAngle(dgr);
       return this;
     };
 
@@ -87,7 +92,7 @@
       this.angle = angle != null ? angle : 0;
       this.width = width != null ? width : 100;
       this.height = height != null ? height : 10;
-      Rectangle.__super__.constructor.call(this, pos, angle);
+      Rectangle.__super__.constructor.call(this, pos, this.angle);
     }
 
     Rectangle.prototype.collided = function(point) {

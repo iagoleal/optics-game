@@ -47,6 +47,7 @@
         x: pos.x,
         y: pos.y
       };
+      this.stage = ~~(Math.random() * 50);
     }
 
     Star.prototype.collided = function(point) {

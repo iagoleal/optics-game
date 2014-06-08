@@ -266,31 +266,34 @@
     };
 
     Board.prototype.animate = function() {
-      var coll, gun, i, _i, _len, _ref,
-        _this = this;
+      var coll, gun, i, _i, _len, _ref, _results;
       _ref = this.guns;
+      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         gun = _ref[_i];
         coll = this.collided(gun.laser.last());
         if (!coll && this.shoted) {
           i = 0;
-          while (!coll && i < 10) {
-            gun.laser.advance();
-            i++;
-            coll = this.collided(gun.laser.last());
-            this.collisionEffect(coll, gun);
-          }
+          _results.push((function() {
+            var _results1;
+            _results1 = [];
+            while (!coll && i < 10) {
+              gun.laser.advance();
+              i++;
+              coll = this.collided(gun.laser.last());
+              _results1.push(this.collisionEffect(coll, gun));
+            }
+            return _results1;
+          }).call(this));
         } else {
           if (coll) {
-            this.collisionEffect(coll, gun);
+            _results.push(this.collisionEffect(coll, gun));
           } else {
-            this.shoted = false;
+            _results.push(this.shoted = false);
           }
         }
       }
-      return setTimeout(function() {
-        return _this.animate();
-      }, 1000 / 60);
+      return _results;
     };
 
     return Board;

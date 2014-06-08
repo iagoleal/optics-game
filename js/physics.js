@@ -32,7 +32,7 @@
   })();
 
   Physics.Optics = {
-    reflec: function() {}
+    reflect: function() {}
   };
 
   Physics.Collision = {

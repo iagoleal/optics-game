@@ -27,18 +27,17 @@ class Geometry.Turnable
 	angle: 0
 	turnable: on #Says if you can turn the object or not
 
-	constructor: (pos={x:0, y:0},@angle=0, @turnable: true) ->
+	constructor: (pos={x:0, y:0},@angle=0, @turnable= true) ->
 		@position =
 			x: pos.x
 			y: pos.y
 
 	turn: (dgr) -> 
-		@angle += dgr
+		@angle = Geometry.reduceAngle( @angle + dgr)
+		return this
 
-		if @angle > 2*Math.PI
-			@angle -= 2*Math.PI
-		else if @angle < 0
-			@angle += 2*Math.PI
+	turnTo: (dgr) -> 
+		@angle = Geometry.reduceAngle(dgr)
 		return this
 
 	collided: (point) ->

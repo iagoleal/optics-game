@@ -57,6 +57,11 @@
       return this.laser.shot(this.front(), this.angle);
     };
 
+    LaserGun.prototype.turnTo = function(dgr) {
+      LaserGun.__super__.turnTo.call(this, dgr);
+      return this.laser.restart(this.front(), this.angle);
+    };
+
     LaserGun.prototype.collided = function(p) {
       return Physics.Collision.circle(p, this.position, this.radius);
     };
@@ -141,6 +146,19 @@
       }
     };
 
+    Long.prototype.restart = function(p, angle) {
+      var q;
+      if (this.path.length) {
+        q = new Physics.Vector(0, angle, {
+          x: p.x,
+          y: p.y
+        });
+        q.magnitude = this.path[0].magnitude;
+        this.path = [];
+        return this.path[0] = q;
+      }
+    };
+
     Long.prototype.draw = function(context) {
       var color, i, lineWidth, _i, _results;
       if (this.path.length) {
@@ -187,6 +205,8 @@
       }
       return _results;
     };
+
+    Short.prototype.restart = function() {};
 
     Short.prototype.draw = function(context) {
       var color, i, lineWidth, ray, _i, _len, _ref1, _results;

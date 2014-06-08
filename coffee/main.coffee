@@ -4,7 +4,7 @@ window.onload = () ->
 	
 	board.setLevel(Levels.test)
 
-	window.board.animate()
+	
 
 	clickTimer = false
 	longPress = no
@@ -43,20 +43,28 @@ window.onload = () ->
 		if longPress
 			buttons.pointTo pos
 
-	requestAnimationFrame(mainLoop)	
+	requestAnimationFrame(draw)
+	requestAnimationFrame(animate)
 
-mainLoop = () ->
-	if typeof mainLoop.lastTime is 'undefined'
-		mainLoop.lastTime = new Date().getTime()
+draw = () ->
+	if typeof draw.lastTime is 'undefined'
+		draw.lastTime = new Date().getTime()
 	else
-		fps = 1000/(new Date().getTime() - mainLoop.lastTime)
+		fps = 1000/(new Date().getTime() - draw.lastTime)
 		document.getElementById("fps").innerHTML = fps.toFixed(2) + ' fps'
-		mainLoop.lastTime = new Date().getTime()
+		draw.lastTime = new Date().getTime()
 
 	board.draw()
 	buttons.draw()
 
-	requestAnimationFrame(mainLoop)	
+	requestAnimationFrame(draw)
+
+
+animate = () ->
+	window.board.animate()
+	
+	requestAnimationFrame(animate)
+
 
 window.requestAnimationFrame = do ->
 	window.requestAnimationFrame or

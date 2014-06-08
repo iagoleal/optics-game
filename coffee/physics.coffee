@@ -18,7 +18,7 @@ class Physics.Vector
 
 
 Physics.Optics = 
-	reflec: () ->
+	reflect: () ->
 
 Physics.Collision =
 	rect: (point, rectPos, width, height, angle=0) ->

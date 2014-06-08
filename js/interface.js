@@ -104,7 +104,7 @@
       if (Physics.Collision.circle(pos, center, this.radius + 40)) {
         dy = center.y - pos.y;
         dx = center.x - pos.x;
-        return this.turnable.angle = Math.atan2(dy, dx) + Math.PI / 2;
+        return this.turnable.turnTo(Math.atan2(dy, dx) + Math.PI / 2);
       }
     };
 

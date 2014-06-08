@@ -152,9 +152,5 @@ class Board
 					@shoted = false# if @collided(@gun.laser.last()) is "wall"
 
 		#m.turn 0 for m in @mirrors
-			
-		setTimeout => 
-			@animate()
-		, 1000/60
-
+		
 window.Board = Board

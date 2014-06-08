@@ -61,7 +61,7 @@ class Turner
 			dx = center.x - pos.x
 			# Sets the new angle
 			# And shifts it by pi/2 so it's the center angle and not the border angle
-			@turnable.angle = Math.atan2(dy, dx) + Math.PI/2
+			@turnable.turnTo (Math.atan2(dy, dx) + Math.PI/2)
 
 	draw: (context) ->
 		radius = switch

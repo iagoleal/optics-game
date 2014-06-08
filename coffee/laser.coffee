@@ -35,6 +35,10 @@ class LaserGun extends Geometry.Turnable
 		#Shot laser
 		@laser.shot(@front(), @angle)
 
+	turnTo: (dgr) ->
+		super dgr
+		@laser.restart @front(), @angle
+
 	collided: (p) ->
 		Physics.Collision.circle(p, @position, @radius)
 
@@ -90,6 +94,13 @@ class Laser.Long extends Laser.Base
 		if @path.length >= 1
 			@path[@path.length-1].magnitude += @velocity
 
+	restart: (p, angle) ->
+		if @path.length
+			q = new Physics.Vector 0, angle, {x: p.x, y: p.y}
+			q.magnitude = @path[0].magnitude
+			@path = []
+			@path[0] = q
+
 	draw: (context) ->
 		if @path.length
 			for i in [5..0]
@@ -111,6 +122,8 @@ class Laser.Short extends Laser.Base
 		for ray in @path
 			ray.origin.x += @velocity*Math.cos(ray.angle)
 			ray.origin.y += @velocity*Math.sin(ray.angle)
+
+	restart: () ->
 
 	draw: (context) ->
 		for ray in @path 

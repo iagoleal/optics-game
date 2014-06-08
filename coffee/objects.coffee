@@ -19,6 +19,7 @@ class Star
 		@position =
 			x: pos.x
 			y: pos.y
+		@stage = ~~(Math.random()*50)
 
 	collided: (point) ->
 		Geometry.dist2(@position, point) <= @radius*@radius
@@ -37,7 +38,6 @@ class Star
 			shadow.offsetX = 0
 			shadow.offsetY = 0
 			shadow.blur = @stage/2
-			#drawer.arc context, a, @position, 0, 360, @radius*1.7, {color: 'rgba(250, 250, 250, 0.2'}
 		drawer.arc context, a, @position, 0, 360, @radius, {color: @color, shadow: shadow }
 
 window.Star = Star
